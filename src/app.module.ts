@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { BannersModule } from './banners/banners.module';
+import { GlobalMiddleware } from './utils/global/global.middleware';
 
 @Module({
   imports: [
@@ -23,4 +24,8 @@ import { BannersModule } from './banners/banners.module';
   controllers: [AppController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(GlobalMiddleware).exclude('public/(.*)').forRoutes('*');
+  }
+}
