@@ -14,3 +14,9 @@ export type ErrorResponse = {
     errors?: unknown;
   };
 };
+
+export type GlobalResponse<T> = {
+  success: boolean;
+  status_code: number;
+  data: T;
+};
