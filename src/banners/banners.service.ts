@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { existsSync } from 'fs';
 import { unlink } from 'fs/promises';
 import path from 'path';
 import { PrismaService } from '../utils/services/prisma.service';
@@ -41,9 +42,11 @@ export class BannersService {
 
     const path = split[split.length - 1];
 
-    // if (existsSync(`.${path}`)) {
-    // }
-    await unlink(`.${path}`);
+    console.log(`.${path}`);
+
+    if (existsSync(`.${path}`)) {
+      await unlink(`.${path}`);
+    }
 
     return this.prisma.banner.delete({
       where: {
