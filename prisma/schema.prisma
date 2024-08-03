@@ -20,3 +20,80 @@ model Banner {
 
   @@map("banner")
 }
+
+model Sync {
+  id               Int      @id               @default(autoincrement())
+  label            String
+  synchronized_at  DateTime @default(now())
+
+  @@map("sync")
+}
+
+model Polling {
+  id          Int      @id               @default(autoincrement())
+  url         String
+  label       String
+  created_at  DateTime @default(now())
+
+  @@map("polling")
+}
+
+model Kategori {
+  id               Int      @id               @default(autoincrement())
+  nama             String   @db.VarChar(255)  @unique
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@map("kategori")
+}
+
+model Produk {
+  id                      Int           @id               @default(autoincrement())
+  kode_item               String        @db.VarChar(255)  @unique           
+  barcode                 String?       @db.VarChar(255)  @unique           
+  kode_pabrik             String?       @db.VarChar(255) 
+  kode_toko               String?       @db.VarChar(255)
+  kode_supplier           String?       @db.VarChar(255)
+  nama_produk             String        @db.VarChar(255) 
+  nama_produk_asli        String?       @db.VarChar(255)
+  nama_produk_sebutan     String?       @db.VarChar(255)
+  merk                    String?       @db.VarChar(255)
+  tipe                    String?       @db.VarChar(255)
+  satuan_besar            String?       @db.VarChar(255)
+  satuan_kecil            String?       @db.VarChar(255)
+  isi_satuan_besar        String?       @db.VarChar(255)
+  kategori                String?       @db.VarChar(255)
+  subkategori             String?       @db.VarChar(255)
+  konversi                Int?          @db.UnsignedInt
+  harga_pokok             Int?          @db.UnsignedInt
+  harga_1                 Int?          @db.UnsignedInt
+  harga_2                 Int?          @db.UnsignedInt
+  harga_3                 Int?          @db.UnsignedInt
+  harga_4                 Int?          @db.UnsignedInt
+  harga_5                 Int?          @db.UnsignedInt
+  harga_6                 Int?          @db.UnsignedInt
+  harga_diskon            Int?          @db.UnsignedInt
+  berat                   Int?          @db.UnsignedInt
+  volume                  Int?          @db.UnsignedInt
+  total_stok              Int?          @db.UnsignedInt
+  slug                    String?       @db.Text
+  deskripsi               String?       @db.Text
+  created_at              DateTime      @default(now())
+  updated_at              DateTime      @updatedAt
+
+  image                   Image[]
+
+  @@map("produk")        
+}
+
+model Image {
+  id                      Int           @id               @default(autoincrement())
+  kode_item               String
+  url                     String        @db.VarChar(255)
+  created_at              DateTime      @default(now())
+  updated_at              DateTime      @updatedAt
+
+  produk                  Produk        @relation(fields: [kode_item], references: [kode_item])
+
+  @@map("image")
+}
