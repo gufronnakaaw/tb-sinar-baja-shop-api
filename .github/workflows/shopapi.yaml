@@ -1,0 +1,22 @@
+name: ShopApi
+on:
+  push:
+    branches: ['main']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy ShopApi using ssh
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /app/tb-sinar-baja-shop-api
+            git pull
+            git status
+            npx prisma generate
+            npm run build
+            pm2 restart api
