@@ -6,6 +6,7 @@ import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BannersModule } from './banners/banners.module';
+import { CategoriesModule } from './categories/categories.module';
 import { GlobalMiddleware } from './utils/global/global.middleware';
 import { PrismaService } from './utils/services/prisma.service';
 
@@ -24,6 +25,7 @@ import { PrismaService } from './utils/services/prisma.service';
     }),
     HttpModule,
     BannersModule,
+    CategoriesModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

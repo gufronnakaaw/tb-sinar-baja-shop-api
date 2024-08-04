@@ -56,4 +56,18 @@ export class AppController {
       throw error;
     }
   }
+
+  @Get('/homepage')
+  @HttpCode(HttpStatus.OK)
+  async getHomepage(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getHomepage(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }

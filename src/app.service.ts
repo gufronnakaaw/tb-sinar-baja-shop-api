@@ -154,4 +154,39 @@ export class AppService {
   polling() {
     return this.prisma.polling.findMany();
   }
+
+  async getHomepage() {
+    const [banners, products] = await this.prisma.$transaction([
+      this.prisma.banner.findMany(),
+      this.prisma.produk.findMany({
+        select: {
+          kode_item: true,
+          slug: true,
+          nama_produk: true,
+          nama_produk_asli: true,
+          kategori: true,
+          harga_1: true,
+          harga_2: true,
+          harga_3: true,
+          harga_4: true,
+          harga_5: true,
+          harga_6: true,
+          image: {
+            select: {
+              url: true,
+            },
+          },
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: 10,
+      }),
+    ]);
+
+    return {
+      banners,
+      newest: products,
+    };
+  }
 }
