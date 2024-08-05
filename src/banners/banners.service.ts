@@ -42,8 +42,6 @@ export class BannersService {
 
     const path = split[split.length - 1];
 
-    console.log(`.${path}`);
-
     if (existsSync(`.${path}`)) {
       await unlink(`.${path}`);
     }
