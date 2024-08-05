@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { chunk, kebabCase, orderBy, sortBy } from 'lodash';
+import { chunk, join, kebabCase, orderBy, sortBy, trim, words } from 'lodash';
 import { firstValueFrom } from 'rxjs';
 import { KategoriPollingResponse, ProdukPollingResponse } from './app.dto';
 import { GlobalResponse } from './utils/global/global.response';
@@ -45,9 +45,9 @@ export class AppService {
           kode_pabrik: item.kode_pabrik,
           kode_toko: item.kode_toko,
           kode_supplier: item.kode_supplier,
-          nama_produk: item.nama_produk,
-          nama_produk_asli: item.nama_produk_asli,
-          nama_produk_sebutan: item.nama_produk_sebutan,
+          nama_produk: join(words(trim(item.nama_produk)), ' '),
+          nama_produk_asli: join(words(trim(item.nama_produk_asli)), ' '),
+          nama_produk_sebutan: join(words(trim(item.nama_produk_sebutan)), ' '),
           harga_1: item.harga_1,
           harga_2: item.harga_2,
           harga_3: item.harga_3,
@@ -64,7 +64,7 @@ export class AppService {
           satuan_besar: item.satuan_besar,
           satuan_kecil: item.satuan_kecil,
           tipe: item.tipe,
-          slug: kebabCase(item.nama_produk_asli),
+          slug: kebabCase(join(words(trim(item.nama_produk_asli)), ' ')),
           kategori: item.kategori,
           subkategori: item.subkategori,
           kode_item: item.kode_item,
