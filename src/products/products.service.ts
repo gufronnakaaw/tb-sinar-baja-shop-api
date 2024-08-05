@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { existsSync } from 'fs';
+import { unlink } from 'fs/promises';
+import { trim } from 'lodash';
+import path from 'path';
 import { PrismaService } from '../utils/services/prisma.service';
 import { ProductQuery } from './product.dto';
 
@@ -34,6 +38,9 @@ export class ProductsService {
               select: {
                 url: true,
               },
+              orderBy: {
+                created_at: 'desc',
+              },
             },
           },
           take: limit,
@@ -62,6 +69,9 @@ export class ProductsService {
             image: {
               select: {
                 url: true,
+              },
+              orderBy: {
+                created_at: 'desc',
               },
             },
           },
@@ -92,6 +102,9 @@ export class ProductsService {
               select: {
                 url: true,
               },
+              orderBy: {
+                created_at: 'desc',
+              },
             },
           },
           take: limit,
@@ -120,6 +133,9 @@ export class ProductsService {
             image: {
               select: {
                 url: true,
+              },
+              orderBy: {
+                created_at: 'desc',
               },
             },
           },
@@ -150,10 +166,52 @@ export class ProductsService {
           select: {
             url: true,
           },
+          orderBy: {
+            created_at: 'desc',
+          },
         },
       },
       take: limit,
       skip,
+    });
+  }
+
+  createImage(file: Express.Multer.File, url: string) {
+    const filename = trim(file.originalname.split('.')[0]);
+    return this.prisma.image.create({
+      data: {
+        kode_item: filename,
+        url: url + '/' + file.path.split(path.sep).join('/'),
+      },
+    });
+  }
+
+  async deleteImage(id: number, url: string) {
+    const image = await this.prisma.image.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        url: true,
+      },
+    });
+
+    if (!image) {
+      throw new NotFoundException('Image not found!');
+    }
+
+    const split = image.url.split(url);
+
+    const path = split[split.length - 1];
+
+    if (existsSync(`.${path}`)) {
+      await unlink(`.${path}`);
+    }
+
+    return this.prisma.image.delete({
+      where: {
+        id,
+      },
     });
   }
 }
