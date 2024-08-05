@@ -176,11 +176,22 @@ export class ProductsService {
     });
   }
 
-  createImage(file: Express.Multer.File, url: string) {
-    const filename = trim(file.originalname.split('.')[0]);
+  async createImage(file: Express.Multer.File, url: string, kode_item: string) {
+    if (!kode_item) {
+      const filename = trim(file.originalname.split('.')[0])
+        .replace('+', '/')
+        .replace('_', '.');
+      return this.prisma.image.create({
+        data: {
+          kode_item: filename,
+          url: url + '/' + file.path.split(path.sep).join('/'),
+        },
+      });
+    }
+
     return this.prisma.image.create({
       data: {
-        kode_item: filename,
+        kode_item,
         url: url + '/' + file.path.split(path.sep).join('/'),
       },
     });

@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
@@ -64,12 +65,17 @@ export class ProductsController {
     @UploadedFile()
     file: Express.Multer.File,
     @Req() req: Request,
+    @Body() body: { kode_item: string },
   ): Promise<SuccessResponse> {
     try {
       return {
         success: true,
         status_code: HttpStatus.CREATED,
-        data: await this.productsService.createImage(file, req.fullurl),
+        data: await this.productsService.createImage(
+          file,
+          req.fullurl,
+          body.kode_item,
+        ),
       };
     } catch (error) {
       throw error;
