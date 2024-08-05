@@ -180,7 +180,7 @@ export class AppService {
         orderBy: {
           created_at: 'desc',
         },
-        take: 10,
+        take: 14,
       }),
     ]);
 
