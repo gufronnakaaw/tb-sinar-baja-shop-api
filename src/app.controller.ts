@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { AppService } from './app.service';
 import { SuccessResponse } from './utils/global/global.response';
 
@@ -44,22 +37,6 @@ export class AppController {
         success: true,
         status_code: HttpStatus.CREATED,
         data: await this.appService.syncCategories(),
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Post('/sync/products/:id_kategori')
-  @HttpCode(HttpStatus.CREATED)
-  async syncProductByCategories(
-    @Param('id_kategori') id_kategori: string,
-  ): Promise<SuccessResponse> {
-    try {
-      return {
-        success: true,
-        status_code: HttpStatus.CREATED,
-        data: await this.appService.syncProductByCategories(id_kategori),
       };
     } catch (error) {
       throw error;

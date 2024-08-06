@@ -38,6 +38,22 @@ export class ProductsController {
     }
   }
 
+  @Get(':slug')
+  @HttpCode(HttpStatus.OK)
+  async getProductBySlug(
+    @Param('slug') slug: string,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.productsService.getProductBySlug(slug),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Post('/image')
   @UseInterceptors(
     FileInterceptor('product', {

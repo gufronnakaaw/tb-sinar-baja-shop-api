@@ -175,6 +175,45 @@ export class ProductsService {
     });
   }
 
+  async getProductBySlug(slug: string) {
+    const product = await this.prisma.produk.findFirst({
+      where: {
+        slug,
+      },
+      select: {
+        kode_item: true,
+        slug: true,
+        nama_produk: true,
+        nama_produk_asli: true,
+        kategori: true,
+        harga_6: true,
+        total_stok: true,
+        image: {
+          select: {
+            url: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+        },
+        berat: true,
+        volume: true,
+        merk: true,
+        tipe: true,
+        satuan_kecil: true,
+        satuan_besar: true,
+        isi_satuan_besar: true,
+        deskripsi: true,
+      },
+    });
+
+    if (product) {
+      Object.assign(product, { terjual: 0 });
+    }
+
+    return product;
+  }
+
   async createImage(
     file: Express.Multer.File,
     url: string,
