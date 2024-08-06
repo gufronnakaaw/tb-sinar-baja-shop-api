@@ -8,7 +8,7 @@ export class DashboardService {
 
   async getProducts(query: ProductQuery) {
     const defaultPage = 1;
-    const limit = 20;
+    const limit = 10;
 
     const page = parseInt(query.page) ? parseInt(query.page) : defaultPage;
 
