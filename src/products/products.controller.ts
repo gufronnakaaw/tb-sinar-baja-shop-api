@@ -65,7 +65,7 @@ export class ProductsController {
     @UploadedFile()
     file: Express.Multer.File,
     @Req() req: Request,
-    @Body() body: { kode_item: string },
+    @Body() body: { kode_item: string; deskripsi: string },
   ): Promise<SuccessResponse> {
     try {
       return {
@@ -75,6 +75,7 @@ export class ProductsController {
           file,
           req.fullurl,
           body.kode_item,
+          body.deskripsi,
         ),
       };
     } catch (error) {

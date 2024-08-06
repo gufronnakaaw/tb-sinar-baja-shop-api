@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { existsSync } from 'fs';
 import { unlink } from 'fs/promises';
-import { trim } from 'lodash';
 import path from 'path';
 import { PrismaService } from '../utils/services/prisma.service';
 import { ProductQuery } from './product.dto';
@@ -176,25 +175,39 @@ export class ProductsService {
     });
   }
 
-  async createImage(file: Express.Multer.File, url: string, kode_item: string) {
-    if (!kode_item) {
-      const filename = trim(file.originalname.split('.')[0])
-        .replace('+', '/')
-        .replace('_', '.');
-      return this.prisma.image.create({
+  async createImage(
+    file: Express.Multer.File,
+    url: string,
+    kode_item: string,
+    deskripsi: string,
+  ) {
+    if (!file) {
+      return this.prisma.produk.update({
+        where: {
+          kode_item,
+        },
         data: {
-          kode_item: filename,
-          url: url + '/' + file.path.split(path.sep).join('/'),
+          deskripsi,
         },
       });
     }
 
-    return this.prisma.image.create({
-      data: {
-        kode_item,
-        url: url + '/' + file.path.split(path.sep).join('/'),
-      },
-    });
+    return this.prisma.$transaction([
+      this.prisma.produk.update({
+        where: {
+          kode_item,
+        },
+        data: {
+          deskripsi,
+        },
+      }),
+      this.prisma.image.create({
+        data: {
+          kode_item,
+          url: url + '/' + file.path.split(path.sep).join('/'),
+        },
+      }),
+    ]);
   }
 
   async deleteImage(id: number, url: string) {
