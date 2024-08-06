@@ -14,8 +14,12 @@ export class DashboardService {
 
     const skip = (page - 1) * limit;
 
-    const [total, products] = await this.prisma.$transaction([
+    const [total, sync, products] = await this.prisma.$transaction([
       this.prisma.produk.count(),
+      this.prisma.sync.findFirst({
+        where: { label: 'produk' },
+        orderBy: { synchronized_at: 'desc' },
+      }),
       this.prisma.produk.findMany({
         select: {
           kode_item: true,
@@ -40,6 +44,7 @@ export class DashboardService {
     ]);
     return {
       products,
+      last_synchronized: sync.synchronized_at,
       total_items: total,
     };
   }
