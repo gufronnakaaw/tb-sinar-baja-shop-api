@@ -50,15 +50,15 @@ export class AppController {
     }
   }
 
-  @Get('/sync/products/:id_kategori')
-  @HttpCode(HttpStatus.OK)
+  @Post('/sync/products/:id_kategori')
+  @HttpCode(HttpStatus.CREATED)
   async syncProductByCategories(
     @Param('id_kategori') id_kategori: string,
   ): Promise<SuccessResponse> {
     try {
       return {
         success: true,
-        status_code: HttpStatus.OK,
+        status_code: HttpStatus.CREATED,
         data: await this.appService.syncProductByCategories(id_kategori),
       };
     } catch (error) {
