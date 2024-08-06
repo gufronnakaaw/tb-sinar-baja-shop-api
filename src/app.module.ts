@@ -10,6 +10,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
 import { GlobalMiddleware } from './utils/global/global.middleware';
 import { PrismaService } from './utils/services/prisma.service';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PrismaService } from './utils/services/prisma.service';
     BannersModule,
     CategoriesModule,
     ProductsModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
