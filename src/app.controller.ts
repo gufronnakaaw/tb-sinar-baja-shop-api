@@ -50,7 +50,7 @@ export class AppController {
     }
   }
 
-  @Get('/sync/products/:id_kategori')
+  @Post('/sync/products/:id_kategori')
   @HttpCode(HttpStatus.OK)
   async syncProductByCategories(
     @Param('id_kategori') id_kategori: string,
