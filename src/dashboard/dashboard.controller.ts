@@ -11,6 +11,7 @@ import {
   Query,
   Req,
   UploadedFile,
+  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -18,9 +19,11 @@ import { Request } from 'express';
 import { diskStorage } from 'multer';
 import { ProductQuery } from '../products/product.dto';
 import { SuccessResponse } from '../utils/global/global.response';
+import { AdminGuard } from '../utils/guards/admin.guard';
 import { DashboardService } from './dashboard.service';
 
 @Controller('dashboard')
+@UseGuards(AdminGuard)
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
