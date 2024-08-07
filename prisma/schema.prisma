@@ -78,6 +78,7 @@ model Produk {
   total_stok              Int?          @db.UnsignedInt
   slug                    String?       @db.Text
   deskripsi               String?       @db.Text
+  active                  Boolean       @default(true)
   created_at              DateTime      @default(now())
   updated_at              DateTime      @updatedAt
 
@@ -96,4 +97,17 @@ model Image {
   produk                  Produk        @relation(fields: [kode_item], references: [kode_item])
 
   @@map("image")
+}
+
+model Operator {
+  id               Int      @id               @default(autoincrement())
+  nama             String   @db.VarChar(255)
+  username         String   @db.VarChar(255)  @unique
+  password_encrypt String   @db.VarChar(255)
+  password_hash    String   @db.VarChar(255)
+  role             String   @db.VarChar(255)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@map("operator")
 }

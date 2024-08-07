@@ -6,7 +6,7 @@ import {
   Param,
   Query,
 } from '@nestjs/common';
-import { SuccessResponse } from 'src/utils/global/global.response';
+import { SuccessResponse } from '../utils/global/global.response';
 import { ProductQuery } from './product.dto';
 import { ProductsService } from './products.service';
 

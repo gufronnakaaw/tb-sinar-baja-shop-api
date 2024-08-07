@@ -5,10 +5,15 @@ import { unlink } from 'fs/promises';
 import { chunk, join, kebabCase, orderBy, sortBy, trim, words } from 'lodash';
 import path from 'path';
 import { firstValueFrom } from 'rxjs';
-import { KategoriPollingResponse, ProdukPollingResponse } from 'src/app.dto';
-import { GlobalResponse } from 'src/utils/global/global.response';
 import { ProductQuery } from '../products/product.dto';
+import { GlobalResponse } from '../utils/global/global.response';
+import { removeKeys } from '../utils/removekey.util';
 import { PrismaService } from '../utils/services/prisma.service';
+import {
+  KategoriPollingResponse,
+  PenggunaPollingResponse,
+  ProdukPollingResponse,
+} from './dashboard.dto';
 
 @Injectable()
 export class DashboardService {
@@ -292,7 +297,11 @@ export class DashboardService {
     const promises = [];
 
     for (const category of categories) {
-      if (!this.prisma.kategori.findFirst({ where: { nama: category.nama } })) {
+      if (
+        !(await this.prisma.kategori.findFirst({
+          where: { nama: category.nama },
+        }))
+      ) {
         promises.push(
           this.prisma.kategori.create({ data: { nama: category.nama } }),
         );
@@ -311,6 +320,75 @@ export class DashboardService {
     await this.prisma.sync.create({
       data: {
         label: 'kategori',
+        synchronized_at: date,
+      },
+    });
+
+    return {
+      synchronized_at: date,
+    };
+  }
+
+  async syncOperators() {
+    const productUrl = await this.prisma.polling.findMany({
+      where: {
+        label: 'pengguna',
+      },
+      select: {
+        url: true,
+      },
+    });
+
+    if (!productUrl.length) {
+      throw new NotFoundException('Polling url not found!');
+    }
+
+    const date = new Date();
+
+    const response = await firstValueFrom(
+      this.httpService.get(productUrl[0].url),
+    );
+
+    const { data }: GlobalResponse<PenggunaPollingResponse[]> = response.data;
+
+    const promises = [];
+
+    const userFilter = data.filter(
+      (item) =>
+        item.role.split(',').includes('owner') ||
+        item.role.split(',').includes('admin'),
+    );
+
+    for (const user of userFilter) {
+      if (
+        !(await this.prisma.operator.findFirst({
+          where: { username: user.username },
+        }))
+      ) {
+        promises.push(
+          this.prisma.operator.create({
+            data: {
+              ...removeKeys(user, ['created_at', 'updated_at']),
+            },
+          }),
+        );
+      } else {
+        promises.push(
+          this.prisma.operator.updateMany({
+            where: { username: user.username },
+            data: {
+              ...removeKeys(user, ['created_at', 'updated_at']),
+            },
+          }),
+        );
+      }
+    }
+
+    await Promise.all(promises);
+
+    await this.prisma.sync.create({
+      data: {
+        label: 'operator',
         synchronized_at: date,
       },
     });

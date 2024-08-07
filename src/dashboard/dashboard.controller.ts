@@ -175,6 +175,20 @@ export class DashboardController {
     }
   }
 
+  @Post('/sync/operators')
+  @HttpCode(HttpStatus.CREATED)
+  async syncOperators(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.CREATED,
+        data: await this.dashboardService.syncOperators(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get('/polling')
   @HttpCode(HttpStatus.OK)
   async getPolling(): Promise<SuccessResponse> {
