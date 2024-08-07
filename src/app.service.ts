@@ -2,8 +2,13 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { chunk, join, kebabCase, orderBy, sortBy, trim, words } from 'lodash';
 import { firstValueFrom } from 'rxjs';
-import { KategoriPollingResponse, ProdukPollingResponse } from './app.dto';
+import {
+  KategoriPollingResponse,
+  ProdukPollingResponse,
+  RegionalPollingResponse,
+} from './app.dto';
 import { GlobalResponse } from './utils/global/global.response';
+import { removeKeys } from './utils/removekey.util';
 import { PrismaService } from './utils/services/prisma.service';
 
 @Injectable()
@@ -276,5 +281,41 @@ export class AppService {
       banners,
       newest: products,
     };
+  }
+
+  async getProvinces() {
+    const response = await firstValueFrom(
+      this.httpService.get('https://wilayah.id/api/provinces.json'),
+    );
+
+    const { data }: { data: RegionalPollingResponse[] } = response.data;
+
+    return data.map((item) => {
+      return removeKeys(item, ['coordinates', 'google_place_id']);
+    });
+  }
+
+  async getRegencies(code: string) {
+    const response = await firstValueFrom(
+      this.httpService.get(`https://wilayah.id/api/regencies/${code}.json`),
+    );
+
+    const { data }: { data: RegionalPollingResponse[] } = response.data;
+
+    return data.map((item) => {
+      return removeKeys(item, ['coordinates', 'google_place_id']);
+    });
+  }
+
+  async getDistricts(code: string) {
+    const response = await firstValueFrom(
+      this.httpService.get(`https://wilayah.id/api/districts/${code}.json`),
+    );
+
+    const { data }: { data: RegionalPollingResponse[] } = response.data;
+
+    return data.map((item) => {
+      return removeKeys(item, ['coordinates', 'google_place_id']);
+    });
   }
 }

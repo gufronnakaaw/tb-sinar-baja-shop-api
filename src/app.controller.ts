@@ -80,6 +80,48 @@ export class AppController {
     }
   }
 
+  @Get('/provinces')
+  @HttpCode(HttpStatus.OK)
+  async getProvinces(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getProvinces(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/regencies/:code')
+  @HttpCode(HttpStatus.OK)
+  async getRegencies(@Param('code') code: string): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getRegencies(code),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/districts/:code')
+  @HttpCode(HttpStatus.OK)
+  async getDistricts(@Param('code') code: string): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getDistricts(code),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get('/homepage')
   @HttpCode(HttpStatus.OK)
   async getHomepage(): Promise<SuccessResponse> {
