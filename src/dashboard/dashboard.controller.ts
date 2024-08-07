@@ -52,7 +52,7 @@ export class DashboardController {
     }
   }
 
-  @Post('/image')
+  @Post('/products/image')
   @UseInterceptors(
     FileInterceptor('product', {
       storage: diskStorage({
@@ -97,7 +97,7 @@ export class DashboardController {
     }
   }
 
-  @Delete('/image/:id')
+  @Delete('/products/image/:id')
   @HttpCode(HttpStatus.OK)
   async destroyProductImage(
     @Param('id') id: string,
