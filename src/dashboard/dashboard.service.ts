@@ -289,19 +289,22 @@ export class DashboardService {
 
     const categories = sortBy(data, ['id_kategori']);
 
-    const promises = categories.map((item) =>
-      this.prisma.kategori.upsert({
-        where: {
-          id: item.id_kategori,
-        },
-        create: {
-          nama: item.nama,
-        },
-        update: {
-          nama: item.nama,
-        },
-      }),
-    );
+    const promises = [];
+
+    for (const category of categories) {
+      if (!this.prisma.kategori.findFirst({ where: { nama: category.nama } })) {
+        promises.push(
+          this.prisma.kategori.create({ data: { nama: category.nama } }),
+        );
+      } else {
+        promises.push(
+          this.prisma.kategori.updateMany({
+            where: { nama: category.nama },
+            data: { nama: category.nama },
+          }),
+        );
+      }
+    }
 
     await Promise.all(promises);
 
