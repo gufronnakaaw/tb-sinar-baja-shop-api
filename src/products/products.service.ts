@@ -1,7 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { existsSync } from 'fs';
-import { unlink } from 'fs/promises';
-import path from 'path';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../utils/services/prisma.service';
 import { ProductQuery } from './product.dto';
 
@@ -212,69 +209,5 @@ export class ProductsService {
     }
 
     return product;
-  }
-
-  async createImage(
-    file: Express.Multer.File,
-    url: string,
-    kode_item: string,
-    deskripsi: string,
-  ) {
-    if (!file) {
-      return this.prisma.produk.update({
-        where: {
-          kode_item,
-        },
-        data: {
-          deskripsi,
-        },
-      });
-    }
-
-    return this.prisma.$transaction([
-      this.prisma.produk.update({
-        where: {
-          kode_item,
-        },
-        data: {
-          deskripsi,
-        },
-      }),
-      this.prisma.image.create({
-        data: {
-          kode_item,
-          url: url + '/' + file.path.split(path.sep).join('/'),
-        },
-      }),
-    ]);
-  }
-
-  async deleteImage(id: number, url: string) {
-    const image = await this.prisma.image.findUnique({
-      where: {
-        id,
-      },
-      select: {
-        url: true,
-      },
-    });
-
-    if (!image) {
-      throw new NotFoundException('Image not found!');
-    }
-
-    const split = image.url.split(url);
-
-    const path = split[split.length - 1];
-
-    if (existsSync(`.${path}`)) {
-      await unlink(`.${path}`);
-    }
-
-    return this.prisma.image.delete({
-      where: {
-        id,
-      },
-    });
   }
 }
