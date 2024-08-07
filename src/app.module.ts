@@ -5,8 +5,6 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { BannersModule } from './banners/banners.module';
-import { CategoriesModule } from './categories/categories.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ProductsModule } from './products/products.module';
 import { GlobalMiddleware } from './utils/global/global.middleware';
@@ -26,8 +24,6 @@ import { PrismaService } from './utils/services/prisma.service';
       serveRoot: '/public',
     }),
     HttpModule,
-    BannersModule,
-    CategoriesModule,
     ProductsModule,
     DashboardModule,
   ],

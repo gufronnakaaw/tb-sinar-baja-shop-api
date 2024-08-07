@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Post,
-} from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
 import { AppService } from './app.service';
 import { SuccessResponse } from './utils/global/global.response';
 
@@ -20,64 +13,6 @@ export class AppController {
       status_code: HttpStatus.OK,
       message: 'Welcome to TB Sinar Baja Shop API',
     };
-  }
-
-  @Post('/sync/products')
-  @HttpCode(HttpStatus.CREATED)
-  async syncProducts(): Promise<SuccessResponse> {
-    try {
-      return {
-        success: true,
-        status_code: HttpStatus.CREATED,
-        data: await this.appService.syncProducts(),
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Post('/sync/categories')
-  @HttpCode(HttpStatus.CREATED)
-  async syncCategories(): Promise<SuccessResponse> {
-    try {
-      return {
-        success: true,
-        status_code: HttpStatus.CREATED,
-        data: await this.appService.syncCategories(),
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Post('/sync/products/:id_kategori')
-  @HttpCode(HttpStatus.OK)
-  async syncProductByCategories(
-    @Param('id_kategori') id_kategori: string,
-  ): Promise<SuccessResponse> {
-    try {
-      return {
-        success: true,
-        status_code: HttpStatus.OK,
-        data: await this.appService.syncProductByCategories(id_kategori),
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Get('/polling')
-  @HttpCode(HttpStatus.OK)
-  async getPolling(): Promise<SuccessResponse> {
-    try {
-      return {
-        success: true,
-        status_code: HttpStatus.OK,
-        data: await this.appService.polling(),
-      };
-    } catch (error) {
-      throw error;
-    }
   }
 
   @Get('/provinces')
@@ -130,6 +65,20 @@ export class AppController {
         success: true,
         status_code: HttpStatus.OK,
         data: await this.appService.getHomepage(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/categories')
+  @HttpCode(HttpStatus.OK)
+  async getCategories(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getCategories(),
       };
     } catch (error) {
       throw error;
