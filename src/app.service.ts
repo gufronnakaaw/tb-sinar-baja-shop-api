@@ -14,7 +14,11 @@ export class AppService {
 
   async getHomepage() {
     const [banners, products] = await this.prisma.$transaction([
-      this.prisma.banner.findMany(),
+      this.prisma.banner.findMany({
+        orderBy: {
+          created_at: 'desc',
+        },
+      }),
       this.prisma.produk.findMany({
         select: {
           kode_item: true,
@@ -31,6 +35,9 @@ export class AppService {
           image: {
             select: {
               url: true,
+            },
+            orderBy: {
+              created_at: 'desc',
             },
           },
         },
