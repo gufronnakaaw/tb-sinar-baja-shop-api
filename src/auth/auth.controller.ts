@@ -8,7 +8,12 @@ import {
 } from '@nestjs/common';
 import { SuccessResponse } from '../utils/global/global.response';
 import { ZodValidationPipe } from '../utils/pipes/zod.pipe';
-import { LoginOperatorDto, loginOperatorSchema } from './auth.dto';
+import {
+  LoginOperatorDto,
+  loginOperatorSchema,
+  LoginUserDto,
+  loginUserSchema,
+} from './auth.dto';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -16,7 +21,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/login/operators')
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   @UsePipes(new ZodValidationPipe(loginOperatorSchema))
   async loginOperator(
     @Body() body: LoginOperatorDto,
@@ -24,8 +29,38 @@ export class AuthController {
     try {
       return {
         success: true,
-        status_code: HttpStatus.CREATED,
+        status_code: HttpStatus.OK,
         data: await this.authService.loginOperator(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post('/register/users')
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ZodValidationPipe(loginOperatorSchema))
+  async registerUser(@Body() body: LoginOperatorDto): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.CREATED,
+        data: await this.authService.registerUser(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post('/login/users')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(loginUserSchema))
+  async loginUser(@Body() body: LoginUserDto): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.authService.loginUser(body),
       };
     } catch (error) {
       throw error;

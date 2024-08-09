@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { verifyPassword } from '../utils/bcrypt.util';
 import { PrismaService } from '../utils/services/prisma.service';
-import { LoginOperatorDto } from './auth.dto';
+import { LoginOperatorDto, LoginUserDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,4 +39,8 @@ export class AuthService {
       ),
     };
   }
+
+  async registerUser() {}
+
+  async loginUser(body: LoginUserDto) {}
 }

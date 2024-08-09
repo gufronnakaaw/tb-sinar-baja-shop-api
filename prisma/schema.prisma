@@ -111,3 +111,47 @@ model Operator {
 
   @@map("operator")
 }
+
+enum JenisKelamin {
+  P
+  W
+}
+
+model User {
+  id               Int              @id               @default(autoincrement())
+  user_id          String           @default(uuid())  @unique
+  email            String           @db.VarChar(255)  @unique
+  nama             String           @db.VarChar(255)
+  no_telpon        String           @db.VarChar(255)  @unique
+  password_hash    String           @db.VarChar(255)
+  tanggal_lahir    String?          @db.VarChar(255)
+  jenis_kelamin    JenisKelamin?    
+
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  address          Address[]
+
+  @@map("user")
+}
+
+
+
+model Address {
+  id               Int              @id               @default(autoincrement())
+  address_id       String           @default(uuid())  @unique
+  user_id          String
+  nama_penerima    String           @db.VarChar(255)
+  no_telpon        String           @db.VarChar(255)  
+  provinsi         String           @db.VarChar(255)
+  kota             String           @db.VarChar(255)
+  kecamatan        String           @db.VarChar(255)
+  alamat_lengkap   String           @db.VarChar(255)
+  label            String           @db.VarChar(255)
+  kode_pos         String           @db.VarChar(255)
+  main_address     Boolean          
+
+  user             User             @relation(fields: [user_id], references: [user_id])
+  
+  @@map("address")
+}
