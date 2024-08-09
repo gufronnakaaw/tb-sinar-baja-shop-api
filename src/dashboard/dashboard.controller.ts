@@ -43,12 +43,30 @@ export class DashboardController {
 
   @Get('/products/:slug')
   @HttpCode(HttpStatus.OK)
-  async detailProduct(@Param('slug') slug: string): Promise<SuccessResponse> {
+  async getProductBySlug(
+    @Param('slug') slug: string,
+  ): Promise<SuccessResponse> {
     try {
       return {
         success: true,
         status_code: HttpStatus.OK,
         data: await this.dashboardService.getProductBySlug(slug),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/products/detail/:kode_item')
+  @HttpCode(HttpStatus.OK)
+  async getProductByKodeItem(
+    @Param('kode_item') kode_item: string,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getProductByKodeItem(kode_item),
       };
     } catch (error) {
       throw error;

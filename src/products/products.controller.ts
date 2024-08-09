@@ -43,4 +43,20 @@ export class ProductsController {
       throw error;
     }
   }
+
+  @Get('/detail/:kode_item')
+  @HttpCode(HttpStatus.OK)
+  async getProductByKodeItem(
+    @Param('kode_item') kode_item: string,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.productsService.getProductByKodeItem(kode_item),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }

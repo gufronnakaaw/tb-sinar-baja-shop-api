@@ -96,6 +96,39 @@ export class DashboardService {
     return product[0];
   }
 
+  getProductByKodeItem(kode_item: string) {
+    return this.prisma.produk.findUnique({
+      where: {
+        kode_item,
+      },
+      select: {
+        kode_item: true,
+        slug: true,
+        nama_produk: true,
+        nama_produk_asli: true,
+        kategori: true,
+        harga_6: true,
+        total_stok: true,
+        image: {
+          select: {
+            url: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+        },
+        berat: true,
+        volume: true,
+        merk: true,
+        tipe: true,
+        satuan_kecil: true,
+        satuan_besar: true,
+        isi_satuan_besar: true,
+        deskripsi: true,
+      },
+    });
+  }
+
   async syncProducts() {
     const productUrl = await this.prisma.polling.findMany({
       where: {
