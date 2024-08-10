@@ -43,6 +43,7 @@ model Kategori {
   nama             String   @db.VarChar(255)  @unique
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
+  active           Boolean  @default(true)
 
   @@map("kategori")
 }
@@ -75,7 +76,7 @@ model Produk {
   harga_diskon            Int?          @db.UnsignedInt
   berat                   Int?          @db.UnsignedInt
   volume                  Int?          @db.UnsignedInt
-  total_stok              Int?          @db.UnsignedInt
+  total_stok              Float?        @db.Float()
   slug                    String?       @db.Text
   deskripsi               String?       @db.Text
   active                  Boolean       @default(true)
@@ -83,6 +84,7 @@ model Produk {
   updated_at              DateTime      @updatedAt
 
   image                   Image[]
+  cart                    Cart[]
 
   @@map("produk")        
 }
@@ -131,6 +133,7 @@ model User {
   updated_at       DateTime @updatedAt
 
   address          Address[]
+  cart             Cart[]
 
   @@map("user")
 }
@@ -154,4 +157,20 @@ model Address {
   user             User             @relation(fields: [user_id], references: [user_id])
   
   @@map("address")
+}
+
+model Cart {
+  cart_id          String           @unique
+  user_id          String
+  kode_item        String
+  qty              Float            @db.Float()
+  active           Boolean          @default(true)
+
+  produk           Produk           @relation(fields: [kode_item], references: [kode_item])     
+  user             User             @relation(fields: [user_id], references: [user_id])
+
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@map("cart")
 }
