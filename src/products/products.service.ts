@@ -17,6 +17,15 @@ export class ProductsService {
     if (query.sort) {
       if (query.sort == 'newest') {
         return this.prisma.produk.findMany({
+          where: {
+            active: true,
+            harga_6: {
+              gt: 0,
+            },
+            total_stok: {
+              gt: 0,
+            },
+          },
           select: {
             kode_item: true,
             slug: true,
@@ -49,6 +58,15 @@ export class ProductsService {
 
       if (query.sort == 'oldest') {
         return this.prisma.produk.findMany({
+          where: {
+            active: true,
+            harga_6: {
+              gt: 0,
+            },
+            total_stok: {
+              gt: 0,
+            },
+          },
           select: {
             kode_item: true,
             slug: true,
@@ -81,6 +99,15 @@ export class ProductsService {
 
       if (query.sort == 'highest') {
         return this.prisma.produk.findMany({
+          where: {
+            active: true,
+            harga_6: {
+              gt: 0,
+            },
+            total_stok: {
+              gt: 0,
+            },
+          },
           select: {
             kode_item: true,
             slug: true,
@@ -113,6 +140,15 @@ export class ProductsService {
 
       if (query.sort == 'lowest') {
         return this.prisma.produk.findMany({
+          where: {
+            active: true,
+            harga_6: {
+              gt: 0,
+            },
+            total_stok: {
+              gt: 0,
+            },
+          },
           select: {
             kode_item: true,
             slug: true,
@@ -145,6 +181,341 @@ export class ProductsService {
     }
 
     return this.prisma.produk.findMany({
+      where: {
+        active: true,
+        harga_6: {
+          gt: 0,
+        },
+        total_stok: {
+          gt: 0,
+        },
+      },
+      select: {
+        kode_item: true,
+        slug: true,
+        nama_produk: true,
+        nama_produk_asli: true,
+        kategori: true,
+        harga_1: true,
+        harga_2: true,
+        harga_3: true,
+        harga_4: true,
+        harga_5: true,
+        harga_6: true,
+        total_stok: true,
+        image: {
+          select: {
+            url: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+        },
+      },
+      take: limit,
+      skip,
+    });
+  }
+
+  async searchProduct(query: ProductQuery) {
+    const defaultPage = 1;
+    const limit = 20;
+
+    const page = parseInt(query.page) ? parseInt(query.page) : defaultPage;
+
+    const skip = (page - 1) * limit;
+
+    if (query.sort) {
+      if (query.sort == 'newest') {
+        return this.prisma.produk.findMany({
+          where: {
+            OR: [
+              {
+                nama_produk_asli: {
+                  contains: query.q,
+                },
+              },
+              {
+                merk: {
+                  contains: query.q,
+                },
+              },
+              {
+                tipe: {
+                  contains: query.q,
+                },
+              },
+            ],
+            AND: [
+              { active: true },
+              {
+                harga_6: {
+                  gt: 0,
+                },
+              },
+              {
+                total_stok: {
+                  gt: 0,
+                },
+              },
+            ],
+          },
+          select: {
+            kode_item: true,
+            slug: true,
+            nama_produk: true,
+            nama_produk_asli: true,
+            kategori: true,
+            harga_1: true,
+            harga_2: true,
+            harga_3: true,
+            harga_4: true,
+            harga_5: true,
+            harga_6: true,
+            total_stok: true,
+            image: {
+              select: {
+                url: true,
+              },
+              orderBy: {
+                created_at: 'desc',
+              },
+            },
+          },
+          take: limit,
+          skip,
+          orderBy: {
+            created_at: 'desc',
+          },
+        });
+      }
+
+      if (query.sort == 'oldest') {
+        return this.prisma.produk.findMany({
+          where: {
+            OR: [
+              {
+                nama_produk_asli: {
+                  contains: query.q,
+                },
+              },
+              {
+                merk: {
+                  contains: query.q,
+                },
+              },
+              {
+                tipe: {
+                  contains: query.q,
+                },
+              },
+            ],
+            AND: [
+              { active: true },
+              {
+                harga_6: {
+                  gt: 0,
+                },
+              },
+              {
+                total_stok: {
+                  gt: 0,
+                },
+              },
+            ],
+          },
+          select: {
+            kode_item: true,
+            slug: true,
+            nama_produk: true,
+            nama_produk_asli: true,
+            kategori: true,
+            harga_1: true,
+            harga_2: true,
+            harga_3: true,
+            harga_4: true,
+            harga_5: true,
+            harga_6: true,
+            total_stok: true,
+            image: {
+              select: {
+                url: true,
+              },
+              orderBy: {
+                created_at: 'desc',
+              },
+            },
+          },
+          take: limit,
+          skip,
+          orderBy: {
+            created_at: 'asc',
+          },
+        });
+      }
+
+      if (query.sort == 'highest') {
+        return this.prisma.produk.findMany({
+          where: {
+            OR: [
+              {
+                nama_produk_asli: {
+                  contains: query.q,
+                },
+              },
+              {
+                merk: {
+                  contains: query.q,
+                },
+              },
+              {
+                tipe: {
+                  contains: query.q,
+                },
+              },
+            ],
+            AND: [
+              { active: true },
+              {
+                harga_6: {
+                  gt: 0,
+                },
+              },
+              {
+                total_stok: {
+                  gt: 0,
+                },
+              },
+            ],
+          },
+          select: {
+            kode_item: true,
+            slug: true,
+            nama_produk: true,
+            nama_produk_asli: true,
+            kategori: true,
+            harga_1: true,
+            harga_2: true,
+            harga_3: true,
+            harga_4: true,
+            harga_5: true,
+            harga_6: true,
+            total_stok: true,
+            image: {
+              select: {
+                url: true,
+              },
+              orderBy: {
+                created_at: 'desc',
+              },
+            },
+          },
+          take: limit,
+          skip,
+          orderBy: {
+            harga_6: 'desc',
+          },
+        });
+      }
+
+      if (query.sort == 'lowest') {
+        return this.prisma.produk.findMany({
+          where: {
+            OR: [
+              {
+                nama_produk_asli: {
+                  contains: query.q,
+                },
+              },
+              {
+                merk: {
+                  contains: query.q,
+                },
+              },
+              {
+                tipe: {
+                  contains: query.q,
+                },
+              },
+            ],
+            AND: [
+              { active: true },
+              {
+                harga_6: {
+                  gt: 0,
+                },
+              },
+              {
+                total_stok: {
+                  gt: 0,
+                },
+              },
+            ],
+          },
+          select: {
+            kode_item: true,
+            slug: true,
+            nama_produk: true,
+            nama_produk_asli: true,
+            kategori: true,
+            harga_1: true,
+            harga_2: true,
+            harga_3: true,
+            harga_4: true,
+            harga_5: true,
+            harga_6: true,
+            total_stok: true,
+            image: {
+              select: {
+                url: true,
+              },
+              orderBy: {
+                created_at: 'desc',
+              },
+            },
+          },
+          take: limit,
+          skip,
+          orderBy: {
+            harga_6: 'asc',
+          },
+        });
+      }
+    }
+
+    return this.prisma.produk.findMany({
+      where: {
+        OR: [
+          {
+            nama_produk_asli: {
+              contains: query.q,
+            },
+          },
+          {
+            merk: {
+              contains: query.q,
+            },
+          },
+          {
+            tipe: {
+              contains: query.q,
+            },
+          },
+        ],
+        AND: [
+          { active: true },
+          {
+            harga_6: {
+              gt: 0,
+            },
+          },
+          {
+            total_stok: {
+              gt: 0,
+            },
+          },
+        ],
+      },
       select: {
         kode_item: true,
         slug: true,

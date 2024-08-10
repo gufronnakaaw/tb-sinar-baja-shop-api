@@ -28,6 +28,20 @@ export class ProductsController {
     }
   }
 
+  @Get('search')
+  @HttpCode(HttpStatus.OK)
+  async searchProduct(@Query() query: ProductQuery): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.productsService.searchProduct(query),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get(':slug')
   @HttpCode(HttpStatus.OK)
   async getProductBySlug(
