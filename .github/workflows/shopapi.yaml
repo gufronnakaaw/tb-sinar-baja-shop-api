@@ -17,6 +17,7 @@ jobs:
             cd /app/tb-sinar-baja-shop-api
             git pull
             git status
+            npm install
             npx prisma db push
             npm run build
             pm2 restart api

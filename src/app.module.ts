@@ -11,6 +11,7 @@ import { GlobalMiddleware } from './utils/global/global.middleware';
 import { PrismaService } from './utils/services/prisma.service';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
+import { CartsModule } from './carts/carts.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ProfileModule } from './profile/profile.module';
     DashboardModule,
     AuthModule,
     ProfileModule,
+    CartsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
