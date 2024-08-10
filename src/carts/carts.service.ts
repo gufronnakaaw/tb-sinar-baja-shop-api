@@ -15,6 +15,7 @@ export class CartsService {
       select: {
         cart_id: true,
         qty: true,
+        active: true,
         produk: {
           select: {
             image: {
