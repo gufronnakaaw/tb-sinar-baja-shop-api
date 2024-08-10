@@ -13,6 +13,8 @@ import {
   loginOperatorSchema,
   LoginUserDto,
   loginUserSchema,
+  RegisterUserDto,
+  registerUserSchema,
 } from './auth.dto';
 import { AuthService } from './auth.service';
 
@@ -39,8 +41,8 @@ export class AuthController {
 
   @Post('/register/users')
   @HttpCode(HttpStatus.CREATED)
-  @UsePipes(new ZodValidationPipe(loginOperatorSchema))
-  async registerUser(@Body() body: LoginOperatorDto): Promise<SuccessResponse> {
+  @UsePipes(new ZodValidationPipe(registerUserSchema))
+  async registerUser(@Body() body: RegisterUserDto): Promise<SuccessResponse> {
     try {
       return {
         success: true,

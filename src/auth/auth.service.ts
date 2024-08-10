@@ -1,8 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { verifyPassword } from '../utils/bcrypt.util';
+import { removeKeys } from 'src/utils/removekey.util';
+import { hashPassword, verifyPassword } from '../utils/bcrypt.util';
 import { PrismaService } from '../utils/services/prisma.service';
-import { LoginOperatorDto, LoginUserDto } from './auth.dto';
+import { LoginOperatorDto, LoginUserDto, RegisterUserDto } from './auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -40,7 +45,54 @@ export class AuthService {
     };
   }
 
-  async registerUser() {}
+  async registerUser(body: RegisterUserDto) {
+    if (
+      await this.prisma.user.findUnique({
+        where: {
+          email: body.email,
+        },
+      })
+    ) {
+      throw new BadRequestException('Email already registered');
+    }
 
-  async loginUser(body: LoginUserDto) {}
+    return removeKeys(
+      await this.prisma.user.create({
+        data: {
+          email: body.email,
+          no_telpon: body.email,
+          nama: body.nama,
+          password_hash: await hashPassword(body.password),
+        },
+      }),
+      ['id'],
+    );
+  }
+
+  async loginUser(body: LoginUserDto) {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: body.email,
+      },
+      select: {
+        user_id: true,
+        password_hash: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Email or password wrong');
+    }
+
+    if (!(await verifyPassword(body.password, user.password_hash))) {
+      throw new NotFoundException('Email or password wrong');
+    }
+
+    return {
+      access_token: await this.jwtService.signAsync({
+        user_id: user.user_id,
+        role: 'user',
+      }),
+    };
+  }
 }
