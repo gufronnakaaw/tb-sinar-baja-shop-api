@@ -2,7 +2,16 @@ import { HttpService } from '@nestjs/axios';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { existsSync } from 'fs';
 import { unlink } from 'fs/promises';
-import { chunk, join, kebabCase, orderBy, sortBy, trim, words } from 'lodash';
+import {
+  chunk,
+  join,
+  kebabCase,
+  orderBy,
+  replace,
+  sortBy,
+  trim,
+  words,
+} from 'lodash';
 import path from 'path';
 import { firstValueFrom } from 'rxjs';
 import { ProductQuery } from '../products/product.dto';
@@ -161,9 +170,11 @@ export class DashboardService {
           kode_pabrik: item.kode_pabrik,
           kode_toko: item.kode_toko,
           kode_supplier: item.kode_supplier,
-          nama_produk: item.nama_produk,
-          nama_produk_asli: item.nama_produk_asli,
-          nama_produk_sebutan: item.nama_produk_sebutan,
+          nama_produk: trim(replace(item.nama_produk, /\s+/g, ' ')),
+          nama_produk_asli: trim(replace(item.nama_produk_asli, /\s+/g, ' ')),
+          nama_produk_sebutan: trim(
+            replace(item.nama_produk_sebutan, /\s+/g, ' '),
+          ),
           harga_1: item.harga_1,
           harga_2: item.harga_2,
           harga_3: item.harga_3,
@@ -249,9 +260,11 @@ export class DashboardService {
           kode_pabrik: item.kode_pabrik,
           kode_toko: item.kode_toko,
           kode_supplier: item.kode_supplier,
-          nama_produk: item.nama_produk,
-          nama_produk_asli: item.nama_produk_asli,
-          nama_produk_sebutan: item.nama_produk_sebutan,
+          nama_produk: trim(replace(item.nama_produk, /\s+/g, ' ')),
+          nama_produk_asli: trim(replace(item.nama_produk_asli, /\s+/g, ' ')),
+          nama_produk_sebutan: trim(
+            replace(item.nama_produk_sebutan, /\s+/g, ' '),
+          ),
           harga_1: item.harga_1,
           harga_2: item.harga_2,
           harga_3: item.harga_3,
