@@ -53,6 +53,7 @@ export class DashboardService {
           kategori: true,
           harga_6: true,
           total_stok: true,
+          active: true,
           image: {
             select: {
               url: true,
