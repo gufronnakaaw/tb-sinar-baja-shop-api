@@ -20,6 +20,15 @@ export class AppService {
         },
       }),
       this.prisma.produk.findMany({
+        where: {
+          active: true,
+          harga_6: {
+            gt: 0,
+          },
+          total_stok: {
+            gt: 0,
+          },
+        },
         select: {
           kode_item: true,
           slug: true,
