@@ -60,7 +60,7 @@ export class AuthService {
       await this.prisma.user.create({
         data: {
           email: body.email,
-          no_telpon: body.email,
+          no_telpon: body.no_telpon,
           nama: body.nama,
           password_hash: await hashPassword(body.password),
         },
@@ -77,6 +77,7 @@ export class AuthService {
       select: {
         user_id: true,
         password_hash: true,
+        nama: true,
       },
     });
 
@@ -89,6 +90,7 @@ export class AuthService {
     }
 
     return {
+      nama: user.nama,
       access_token: await this.jwtService.signAsync({
         user_id: user.user_id,
         role: 'user',
