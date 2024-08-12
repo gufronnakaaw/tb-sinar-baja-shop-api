@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import ShortUniqueId from 'short-unique-id';
 import { PrismaService } from '../utils/services/prisma.service';
 import { CreateCartDto } from './carts.dto';
@@ -87,5 +87,47 @@ export class CartsService {
         add_cart: true,
       };
     }
+  }
+
+  async deleteCart(cart_id: string, user_id: string) {
+    if (!(await this.prisma.cart.findUnique({ where: { cart_id, user_id } }))) {
+      throw new NotFoundException('Cart not found');
+    }
+
+    return this.prisma.cart.delete({
+      where: {
+        cart_id,
+        user_id,
+      },
+    });
+  }
+
+  async updateActiveCart({
+    cart_id,
+    user_id,
+    value,
+  }: {
+    cart_id: string;
+    user_id: string;
+    value: boolean;
+  }) {
+    if (!(await this.prisma.cart.findUnique({ where: { cart_id, user_id } }))) {
+      throw new NotFoundException('Cart not found');
+    }
+
+    await this.prisma.cart.update({
+      where: {
+        cart_id,
+        user_id,
+      },
+      data: {
+        active: value,
+      },
+    });
+
+    return {
+      cart_id,
+      cart_active: value,
+    };
   }
 }

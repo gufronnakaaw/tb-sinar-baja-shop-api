@@ -6,3 +6,10 @@ export const createCartSchema = z.object({
 });
 
 export type CreateCartDto = z.infer<typeof createCartSchema>;
+
+export const updateActiveCart = z.object({
+  cart_id: z.string().trim(),
+  value: z.boolean(),
+});
+
+export type UpdateActiveCart = z.infer<typeof updateActiveCart>;
