@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export type ProdukPollingResponse = {
   kode_item: string;
   barcode: string;
@@ -55,3 +57,11 @@ export type PenggunaPollingResponse = {
   created_at: string;
   updated_at: string;
 };
+
+export const updateActive = z.object({
+  kode_item: z.string().trim().optional(),
+  nama_kategori: z.string().trim().optional(),
+  value: z.boolean(),
+});
+
+export type UpdateActive = z.infer<typeof updateActive>;

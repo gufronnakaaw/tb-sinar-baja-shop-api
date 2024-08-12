@@ -7,19 +7,23 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Query,
   Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { diskStorage } from 'multer';
+import { ZodValidationPipe } from 'src/utils/pipes/zod.pipe';
 import { ProductQuery } from '../products/product.dto';
 import { SuccessResponse } from '../utils/global/global.response';
 import { AdminGuard } from '../utils/guards/admin.guard';
+import { updateActive, UpdateActive } from './dashboard.dto';
 import { DashboardService } from './dashboard.service';
 
 @Controller('dashboard')
@@ -291,6 +295,48 @@ export class DashboardController {
           parseInt(id),
           req.fullurl,
         ),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/categories/active')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateActive))
+  async updateActiveCategory(
+    @Body() body: UpdateActive,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updateActive({
+          type: 'category',
+          nama_kategori: body.nama_kategori,
+          value: body.value,
+        }),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/products/active')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateActive))
+  async updateActiveProduct(
+    @Body() body: UpdateActive,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updateActive({
+          type: 'product',
+          kode_item: body.kode_item,
+          value: body.value,
+        }),
       };
     } catch (error) {
       throw error;

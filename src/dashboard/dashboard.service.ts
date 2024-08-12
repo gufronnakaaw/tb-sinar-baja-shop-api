@@ -575,4 +575,49 @@ export class DashboardService {
       },
     });
   }
+
+  async updateActive(params: {
+    type: 'category' | 'product';
+    kode_item?: string;
+    nama_kategori?: string;
+    value: boolean;
+  }) {
+    if (params.type == 'category') {
+      await this.prisma.$transaction([
+        this.prisma.produk.updateMany({
+          where: {
+            kategori: params.nama_kategori,
+          },
+          data: {
+            active: params.value,
+          },
+        }),
+        this.prisma.kategori.update({
+          where: {
+            nama: params.nama_kategori,
+          },
+          data: {
+            active: params.value,
+          },
+        }),
+      ]);
+
+      return {
+        nama_kategori: params.nama_kategori,
+        category_active: params.value,
+      };
+    }
+
+    await this.prisma.produk.update({
+      where: { kode_item: params.kode_item },
+      data: {
+        active: params.value,
+      },
+    });
+
+    return {
+      kode_item: params.kode_item,
+      product_active: params.value,
+    };
+  }
 }
