@@ -13,3 +13,12 @@ export const updateActiveCart = z.object({
 });
 
 export type UpdateActiveCart = z.infer<typeof updateActiveCart>;
+
+export const updateQuantity = z.object({
+  cart_id: z.string(),
+  kode_item: z.string(),
+  qty: z.number().optional(),
+  type: z.enum(['increment', 'decrement', 'input']),
+});
+
+export type UpdateQuantity = z.infer<typeof updateQuantity>;

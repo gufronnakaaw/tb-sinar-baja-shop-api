@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import ShortUniqueId from 'short-unique-id';
 import { PrismaService } from '../utils/services/prisma.service';
-import { CreateCartDto } from './carts.dto';
+import { CreateCartDto, UpdateQuantity } from './carts.dto';
 
 @Injectable()
 export class CartsService {
@@ -26,6 +30,7 @@ export class CartsService {
                 created_at: 'desc',
               },
             },
+            kode_item: true,
             nama_produk_asli: true,
             harga_6: true,
             kategori: true,
@@ -129,5 +134,91 @@ export class CartsService {
       cart_id,
       cart_active: value,
     };
+  }
+
+  async updateQuantity(body: UpdateQuantity, user_id: string) {
+    if (body.type == 'increment') {
+      const [product, total_stok] = await this.prisma.$transaction([
+        this.prisma.produk.findUnique({
+          where: {
+            kode_item: body.kode_item,
+          },
+          select: {
+            total_stok: true,
+          },
+        }),
+        this.prisma.cart.aggregate({
+          where: {
+            cart_id: body.cart_id,
+            user_id,
+          },
+          _sum: {
+            qty: true,
+          },
+        }),
+      ]);
+
+      if (total_stok._sum.qty + 1 > product.total_stok) {
+        throw new UnprocessableEntityException(
+          'Input stock exceeds total product stock.',
+        );
+      }
+
+      return this.prisma.cart.update({
+        where: { cart_id: body.cart_id, user_id },
+        data: {
+          qty: {
+            increment: 1,
+          },
+        },
+        select: {
+          cart_id: true,
+          user_id: true,
+        },
+      });
+    }
+
+    if (body.type == 'decrement') {
+      return this.prisma.cart.update({
+        where: { cart_id: body.cart_id, user_id },
+        data: {
+          qty: {
+            decrement: 1,
+          },
+        },
+        select: {
+          cart_id: true,
+          user_id: true,
+        },
+      });
+    }
+
+    if (body.type == 'input') {
+      const product = await this.prisma.produk.findUnique({
+        where: {
+          kode_item: body.kode_item,
+        },
+        select: {
+          total_stok: true,
+        },
+      });
+
+      if (body.qty > product.total_stok) {
+        throw new UnprocessableEntityException(
+          'Input stock exceeds total product stock.',
+        );
+      }
+
+      return this.prisma.cart.update({
+        where: { cart_id: body.cart_id, user_id },
+        data: {
+          qty: body.qty,
+        },
+        select: {
+          cart_id: true,
+          user_id: true,
+        },
+      });
+    }
   }
 }

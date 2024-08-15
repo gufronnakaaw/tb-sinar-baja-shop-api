@@ -21,6 +21,8 @@ import {
   createCartSchema,
   UpdateActiveCart,
   updateActiveCart,
+  updateQuantity,
+  UpdateQuantity,
 } from './carts.dto';
 import { CartsService } from './carts.service';
 
@@ -77,6 +79,27 @@ export class CartsController {
           user_id: request.user.user_id,
           value: body.value,
         }),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('quantity')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateQuantity))
+  async updateQuantity(
+    @Body() body: UpdateQuantity,
+    @Req() request: Request,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.cartsService.updateQuantity(
+          body,
+          request.user.user_id,
+        ),
       };
     } catch (error) {
       throw error;
