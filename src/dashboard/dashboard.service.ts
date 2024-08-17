@@ -95,6 +95,11 @@ export class DashboardService {
         where: {
           OR: [
             {
+              kode_item: {
+                contains: query.q,
+              },
+            },
+            {
               nama_produk_asli: {
                 contains: query.q,
               },
@@ -124,6 +129,11 @@ export class DashboardService {
       this.prisma.produk.findMany({
         where: {
           OR: [
+            {
+              kode_item: {
+                contains: query.q,
+              },
+            },
             {
               nama_produk_asli: {
                 contains: query.q,
