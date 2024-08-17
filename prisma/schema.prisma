@@ -174,3 +174,26 @@ model Cart {
 
   @@map("cart")
 }
+
+model Operational {
+  hari             String          @unique
+  open             String
+  close            String
+
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+
+  @@map("operational")
+}
+
+model BankAccount {
+  bank_id         String           @unique
+  no_rekening     String           
+  atas_nama       String
+  bank            String
+
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  @@map("bankaccount")
+}
