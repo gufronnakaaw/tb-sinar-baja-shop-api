@@ -106,4 +106,18 @@ export class AppService {
       },
     });
   }
+
+  async getCheckout(user_id: string) {
+    const [banks, address] = await this.prisma.$transaction([
+      this.prisma.bankAccount.findMany(),
+      this.prisma.address.findMany({ where: { user_id } }),
+    ]);
+
+    return {
+      banks: banks.map((bank) =>
+        removeKeys(bank, ['created_at', 'updated_at']),
+      ),
+      address: address.map((item) => removeKeys(item, ['id', 'main_address'])),
+    };
+  }
 }

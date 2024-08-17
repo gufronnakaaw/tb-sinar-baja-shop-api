@@ -1,6 +1,16 @@
-import { Controller, Get, HttpCode, HttpStatus, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { Request } from 'express';
 import { AppService } from './app.service';
 import { SuccessResponse } from './utils/global/global.response';
+import { UserGuard } from './utils/guards/user.guard';
 
 @Controller()
 export class AppController {
@@ -79,6 +89,21 @@ export class AppController {
         success: true,
         status_code: HttpStatus.OK,
         data: await this.appService.getCategories(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @UseGuards(UserGuard)
+  @Get('/checkout')
+  @HttpCode(HttpStatus.OK)
+  async getCheckout(@Req() request: Request): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getCheckout(request.user.user_id),
       };
     } catch (error) {
       throw error;
