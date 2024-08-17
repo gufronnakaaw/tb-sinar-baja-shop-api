@@ -52,6 +52,20 @@ export class DashboardController {
     }
   }
 
+  @Get('/products/search')
+  @HttpCode(HttpStatus.OK)
+  async searchProducts(@Query() query: ProductQuery): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.searchProducts(query),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get('/products/:slug')
   @HttpCode(HttpStatus.OK)
   async getProductBySlug(

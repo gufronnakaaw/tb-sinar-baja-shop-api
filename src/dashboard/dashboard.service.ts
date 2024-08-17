@@ -82,6 +82,99 @@ export class DashboardService {
     };
   }
 
+  async searchProducts(query: ProductQuery) {
+    const defaultPage = 1;
+    const limit = 10;
+
+    const page = parseInt(query.page) ? parseInt(query.page) : defaultPage;
+
+    const skip = (page - 1) * limit;
+
+    const [total, sync, products] = await this.prisma.$transaction([
+      this.prisma.produk.count({
+        where: {
+          OR: [
+            {
+              nama_produk_asli: {
+                contains: query.q,
+              },
+            },
+            {
+              merk: {
+                contains: query.q,
+              },
+            },
+            {
+              tipe: {
+                contains: query.q,
+              },
+            },
+            {
+              kategori: {
+                contains: query.q,
+              },
+            },
+          ],
+        },
+      }),
+      this.prisma.sync.findFirst({
+        where: { label: 'produk' },
+        orderBy: { synchronized_at: 'desc' },
+      }),
+      this.prisma.produk.findMany({
+        where: {
+          OR: [
+            {
+              nama_produk_asli: {
+                contains: query.q,
+              },
+            },
+            {
+              merk: {
+                contains: query.q,
+              },
+            },
+            {
+              tipe: {
+                contains: query.q,
+              },
+            },
+            {
+              kategori: {
+                contains: query.q,
+              },
+            },
+          ],
+        },
+        select: {
+          kode_item: true,
+          slug: true,
+          nama_produk_asli: true,
+          kategori: true,
+          harga_6: true,
+          total_stok: true,
+          active: true,
+          image: {
+            select: {
+              url: true,
+            },
+            orderBy: {
+              created_at: 'desc',
+            },
+          },
+          deskripsi: true,
+        },
+        take: limit,
+        skip,
+      }),
+    ]);
+    return {
+      products,
+      last_synchronized: sync.synchronized_at,
+      total_items: total,
+    };
+  }
+
   async getProductBySlug(slug: string) {
     if (!slug) {
       return {};
