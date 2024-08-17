@@ -4,6 +4,7 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -104,6 +105,33 @@ export class AppController {
         success: true,
         status_code: HttpStatus.OK,
         data: await this.appService.getCheckout(request.user.user_id),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/check')
+  @HttpCode(HttpStatus.OK)
+  async checkQuantity(
+    @Query() query: { kode_item: string; quantity: string },
+  ): Promise<SuccessResponse> {
+    try {
+      if (query.kode_item && query.quantity) {
+        return {
+          success: true,
+          status_code: HttpStatus.OK,
+          data: await this.appService.checkQuantity(
+            query.kode_item,
+            parseInt(query.quantity),
+          ),
+        };
+      }
+
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: {},
       };
     } catch (error) {
       throw error;

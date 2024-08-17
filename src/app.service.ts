@@ -1,5 +1,5 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnprocessableEntityException } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { RegionalPollingResponse } from './app.dto';
 import { removeKeys } from './utils/removekey.util';
@@ -118,6 +118,23 @@ export class AppService {
         removeKeys(bank, ['created_at', 'updated_at']),
       ),
       address: address.map((item) => removeKeys(item, ['id', 'main_address'])),
+    };
+  }
+
+  async checkQuantity(kode_item: string, quantity: number) {
+    const product = await this.prisma.produk.findUnique({
+      where: { kode_item },
+      select: { total_stok: true },
+    });
+
+    if (quantity > product.total_stok) {
+      throw new UnprocessableEntityException(
+        'Input stock exceeds total product stock.',
+      );
+    }
+
+    return {
+      can_checkout: true,
     };
   }
 }
