@@ -1,5 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { existsSync } from 'fs';
 import { unlink } from 'fs/promises';
 import {
@@ -14,14 +18,17 @@ import {
 } from 'lodash';
 import path from 'path';
 import { firstValueFrom } from 'rxjs';
+import ShortUniqueId from 'short-unique-id';
 import { ProductQuery } from '../products/product.dto';
 import { GlobalResponse } from '../utils/global/global.response';
 import { removeKeys } from '../utils/removekey.util';
 import { PrismaService } from '../utils/services/prisma.service';
 import {
+  CreateBankDto,
   KategoriPollingResponse,
   PenggunaPollingResponse,
   ProdukPollingResponse,
+  UpdateBankDto,
 } from './dashboard.dto';
 
 @Injectable()
@@ -620,5 +627,66 @@ export class DashboardService {
       kode_item: params.kode_item,
       product_active: params.value,
     };
+  }
+
+  async getBanks() {
+    return this.prisma.bankAccount.findMany();
+  }
+
+  async createBank(body: CreateBankDto) {
+    if (
+      await this.prisma.bankAccount.count({
+        where: { no_rekening: body.no_rekening },
+      })
+    ) {
+      throw new BadRequestException('Already bank account');
+    }
+
+    const uid = new ShortUniqueId({ length: 10 });
+
+    return this.prisma.bankAccount.create({
+      data: {
+        bank_id: uid.rnd(),
+        no_rekening: body.no_rekening,
+        atas_nama: body.atas_nama,
+        bank: body.bank,
+      },
+      select: {
+        bank_id: true,
+      },
+    });
+  }
+
+  async updateBank(body: UpdateBankDto) {
+    if (
+      !(await this.prisma.bankAccount.count({
+        where: { bank_id: body.bank_id },
+      }))
+    ) {
+      throw new NotFoundException('Bank account not found');
+    }
+
+    return this.prisma.bankAccount.update({
+      where: {
+        bank_id: body.bank_id,
+      },
+      data: {
+        no_rekening: body.no_rekening,
+        atas_nama: body.atas_nama,
+        bank: body.bank,
+      },
+    });
+  }
+
+  async destroyBank(bank_id: string) {
+    if (
+      !(await this.prisma.bankAccount.count({
+        where: { bank_id },
+      }))
+    ) {
+      throw new NotFoundException('Bank account not found');
+    }
+
+    return this.prisma.bankAccount.delete({ where: { bank_id } });
   }
 }

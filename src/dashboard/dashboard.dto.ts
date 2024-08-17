@@ -65,3 +65,20 @@ export const updateActive = z.object({
 });
 
 export type UpdateActive = z.infer<typeof updateActive>;
+
+export const createBankSchema = z.object({
+  no_rekening: z.string(),
+  atas_nama: z.string(),
+  bank: z.string(),
+});
+
+export type CreateBankDto = z.infer<typeof createBankSchema>;
+
+export const updateBankSchema = z.object({
+  bank_id: z.string(),
+  no_rekening: z.string().optional(),
+  atas_nama: z.string().optional(),
+  bank: z.string().optional(),
+});
+
+export type UpdateBankDto = z.infer<typeof updateBankSchema>;

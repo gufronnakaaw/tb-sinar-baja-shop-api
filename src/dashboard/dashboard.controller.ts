@@ -23,7 +23,14 @@ import { ZodValidationPipe } from 'src/utils/pipes/zod.pipe';
 import { ProductQuery } from '../products/product.dto';
 import { SuccessResponse } from '../utils/global/global.response';
 import { AdminGuard } from '../utils/guards/admin.guard';
-import { updateActive, UpdateActive } from './dashboard.dto';
+import {
+  CreateBankDto,
+  createBankSchema,
+  updateActive,
+  UpdateActive,
+  UpdateBankDto,
+  updateBankSchema,
+} from './dashboard.dto';
 import { DashboardService } from './dashboard.service';
 
 @Controller('dashboard')
@@ -337,6 +344,66 @@ export class DashboardController {
           kode_item: body.kode_item,
           value: body.value,
         }),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/banks')
+  @HttpCode(HttpStatus.OK)
+  async getBanks(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getBanks(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post('/banks')
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ZodValidationPipe(createBankSchema))
+  async createBank(@Body() body: CreateBankDto): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.CREATED,
+        data: await this.dashboardService.createBank(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/banks')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateBankSchema))
+  async updateBank(@Body() body: UpdateBankDto): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updateBank(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Delete('/banks/:bank_id')
+  @HttpCode(HttpStatus.OK)
+  async destroyBank(
+    @Param('bank_id') bank_id: string,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.destroyBank(bank_id),
       };
     } catch (error) {
       throw error;
