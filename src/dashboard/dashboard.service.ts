@@ -794,9 +794,18 @@ export class DashboardService {
   }
 
   async getOperators() {
-    const operators = await this.prisma.operator.findMany();
+    const [sync, operators] = await this.prisma.$transaction([
+      this.prisma.sync.findFirst({
+        where: { label: 'pengguna' },
+        orderBy: { synchronized_at: 'desc' },
+      }),
+      this.prisma.operator.findMany(),
+    ]);
 
-    return operators.map((operator) => removeKeys(operator, ['id']));
+    return {
+      operators: operators.map((operator) => removeKeys(operator, ['id'])),
+      last_synchronized: sync ? sync.synchronized_at : '0',
+    };
   }
 
   async deleteOperator(username: string) {
