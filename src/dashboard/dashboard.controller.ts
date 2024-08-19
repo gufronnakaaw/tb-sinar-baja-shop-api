@@ -423,4 +423,34 @@ export class DashboardController {
       throw error;
     }
   }
+
+  @Get('/operators')
+  @HttpCode(HttpStatus.OK)
+  async getOperators(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getOperators(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Delete('/operators/:username')
+  @HttpCode(HttpStatus.OK)
+  async destroyOperator(
+    @Param('username') username: string,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.deleteOperator(username),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }

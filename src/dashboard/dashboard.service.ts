@@ -792,4 +792,21 @@ export class DashboardService {
 
     return this.prisma.bankAccount.delete({ where: { bank_id } });
   }
+
+  async getOperators() {
+    const operators = await this.prisma.operator.findMany();
+
+    return operators.map((operator) => removeKeys(operator, ['id']));
+  }
+
+  async deleteOperator(username: string) {
+    if (!(await this.prisma.operator.count({ where: { username } }))) {
+      throw new NotFoundException('Operator not found');
+    }
+
+    return this.prisma.operator.delete({
+      where: { username },
+      select: { username: true },
+    });
+  }
 }
