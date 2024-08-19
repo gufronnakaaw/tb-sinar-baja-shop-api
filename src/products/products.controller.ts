@@ -73,4 +73,21 @@ export class ProductsController {
       throw error;
     }
   }
+
+  @Get('/category/:name')
+  @HttpCode(HttpStatus.OK)
+  async getProductsByCategory(
+    @Query() query: ProductQuery,
+    @Param('name') name: string,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.productsService.getProductsByCategory(name, query),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }
