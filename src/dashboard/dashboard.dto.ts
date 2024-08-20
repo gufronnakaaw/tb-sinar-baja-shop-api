@@ -82,3 +82,18 @@ export const updateBankSchema = z.object({
 });
 
 export type UpdateBankDto = z.infer<typeof updateBankSchema>;
+
+export const createPollingSchema = z.object({
+  url: z.string(),
+  label: z.enum(['pengguna', 'produk', 'kategori']),
+});
+
+export type CreatePollingDto = z.infer<typeof createPollingSchema>;
+
+export const updatePollingSchema = z.object({
+  id: z.number(),
+  url: z.string().optional(),
+  label: z.enum(['pengguna', 'produk', 'kategori']).optional(),
+});
+
+export type UpdatePollingDto = z.infer<typeof updatePollingSchema>;

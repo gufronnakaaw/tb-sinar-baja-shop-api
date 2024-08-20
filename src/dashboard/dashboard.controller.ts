@@ -26,10 +26,14 @@ import { AdminGuard } from '../utils/guards/admin.guard';
 import {
   CreateBankDto,
   createBankSchema,
+  CreatePollingDto,
+  createPollingSchema,
   updateActive,
   UpdateActive,
   UpdateBankDto,
   updateBankSchema,
+  UpdatePollingDto,
+  updatePollingSchema,
 } from './dashboard.dto';
 import { DashboardService } from './dashboard.service';
 
@@ -242,7 +246,55 @@ export class DashboardController {
       return {
         success: true,
         status_code: HttpStatus.OK,
-        data: await this.dashboardService.polling(),
+        data: await this.dashboardService.getPolling(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post('/polling')
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ZodValidationPipe(createPollingSchema))
+  async createPolling(
+    @Body() body: CreatePollingDto,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.CREATED,
+        data: await this.dashboardService.createPolling(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/polling')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updatePollingSchema))
+  async updatePolling(
+    @Body() body: UpdatePollingDto,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updatePolling(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Delete('/polling/:id')
+  @HttpCode(HttpStatus.OK)
+  async destroyPolling(@Param('id') id: string): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.destroyPolling(id),
       };
     } catch (error) {
       throw error;

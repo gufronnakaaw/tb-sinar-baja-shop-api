@@ -25,10 +25,12 @@ import { removeKeys } from '../utils/removekey.util';
 import { PrismaService } from '../utils/services/prisma.service';
 import {
   CreateBankDto,
+  CreatePollingDto,
   KategoriPollingResponse,
   PenggunaPollingResponse,
   ProdukPollingResponse,
   UpdateBankDto,
+  UpdatePollingDto,
 } from './dashboard.dto';
 
 @Injectable()
@@ -555,8 +557,45 @@ export class DashboardService {
     };
   }
 
-  polling() {
+  getPolling() {
     return this.prisma.polling.findMany();
+  }
+
+  async createPolling(body: CreatePollingDto) {
+    if (await this.prisma.polling.count({ where: { url: body.url } })) {
+      throw new BadRequestException('Polling url already exits');
+    }
+
+    return this.prisma.polling.create({
+      data: {
+        url: body.url,
+        label: body.label,
+      },
+    });
+  }
+
+  async updatePolling(body: UpdatePollingDto) {
+    if (!(await this.prisma.polling.count({ where: { id: body.id } }))) {
+      throw new NotFoundException('Polling url notfound');
+    }
+
+    return this.prisma.polling.update({
+      where: {
+        id: body.id,
+      },
+      data: {
+        url: body.url,
+        label: body.label,
+      },
+    });
+  }
+
+  async destroyPolling(id: string) {
+    if (!(await this.prisma.polling.count({ where: { id: parseInt(id) } }))) {
+      throw new NotFoundException('Polling url notfound');
+    }
+
+    return this.prisma.polling.delete({ where: { id: parseInt(id) } });
   }
 
   getBanners() {
