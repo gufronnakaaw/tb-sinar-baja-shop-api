@@ -857,4 +857,8 @@ export class DashboardService {
       select: { username: true },
     });
   }
+
+  async getOperationals() {
+    return this.prisma.operational.findMany();
+  }
 }

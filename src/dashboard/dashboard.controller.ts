@@ -505,4 +505,18 @@ export class DashboardController {
       throw error;
     }
   }
+
+  @Get('/operational')
+  @HttpCode(HttpStatus.OK)
+  async getOperationals(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getOperationals(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }
