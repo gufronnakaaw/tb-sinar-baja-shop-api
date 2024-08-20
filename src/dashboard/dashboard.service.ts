@@ -835,7 +835,7 @@ export class DashboardService {
   async getOperators() {
     const [sync, operators] = await this.prisma.$transaction([
       this.prisma.sync.findFirst({
-        where: { label: 'pengguna' },
+        where: { label: 'operator' },
         orderBy: { synchronized_at: 'desc' },
       }),
       this.prisma.operator.findMany(),
