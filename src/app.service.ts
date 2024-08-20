@@ -101,6 +101,9 @@ export class AppService {
 
   getCategories() {
     return this.prisma.kategori.findMany({
+      where: {
+        active: true,
+      },
       orderBy: {
         nama: 'asc',
       },
