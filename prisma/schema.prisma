@@ -85,6 +85,7 @@ model Produk {
 
   image                   Image[]
   cart                    Cart[]
+  transaksidetail         TransaksiDetail[]
 
   @@map("produk")        
 }
@@ -134,6 +135,7 @@ model User {
 
   address          Address[]
   cart             Cart[]
+  user             Transaksi[]
 
   @@map("user")
 }
@@ -196,4 +198,94 @@ model BankAccount {
   updated_at      DateTime @updatedAt
 
   @@map("bankaccount")
+}
+
+enum Type {
+  delivery
+  pickup
+}
+
+enum StatusTransaksi {
+  draft
+  pending
+  canceled
+}
+
+enum StatusPayment {
+  draft
+  pending
+  paid
+  done
+  canceled
+}
+
+model Transaksi {
+  id               Int              @id               @default(autoincrement())
+  transaksi_id     String           @unique
+  user_id          String
+  
+  no_rekening      String           
+  atas_nama        String
+  bank             String
+  
+  nama_penerima    String?          @db.VarChar(255)
+  no_telpon        String?          @db.VarChar(255)  
+  provinsi         String?          @db.VarChar(255)
+  kota             String?          @db.VarChar(255)
+  kecamatan        String?          @db.VarChar(255)
+  alamat_lengkap   String?          @db.VarChar(255)
+  kode_pos         String?          @db.VarChar(255)
+
+  type             Type
+  subtotal_produk  Int              @db.UnsignedInt 
+  subtotal_ongkir  Int?             @db.UnsignedInt   @default(0)
+  total            Int              @db.UnsignedInt
+  note             String? 
+  status           StatusTransaksi
+  replied          Boolean?         @default(false)
+  alasan           String?
+
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+
+  user             User             @relation(fields: [user_id], references: [user_id])
+  payment          Payment?
+
+  @@map("transaksi")
+}
+
+model TransaksiDetail {
+  id               Int              @id               @default(autoincrement())
+  transaksi_id     String           
+  produk_id        String
+  quantity         Float
+  harga            Int              @db.UnsignedInt
+  subtotal         Int              @db.UnsignedInt
+
+  produk           Produk           @relation(fields: [produk_id], references: [kode_item])
+
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+
+  @@map("transaksidetail")
+}
+
+model Payment {
+  id               Int              @id               @default(autoincrement())
+  payment_id       String           @unique
+  transaksi_id     String           @unique
+  status           StatusPayment
+  url              String?
+  metode           String?          @default("transfer")
+  expired          BigInt?          @db.UnsignedBigInt
+  nama             String?
+  dari             String?
+  alasan           String?
+
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+
+  transaksi        Transaksi        @relation(fields: [transaksi_id], references: [transaksi_id])
+  
+  @@map("payment")
 }
