@@ -1,7 +1,8 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import { isArray } from 'lodash';
 import { firstValueFrom } from 'rxjs';
-import { RegionalPollingResponse } from './app.dto';
+import { PreviewQuery, RegionalPollingResponse } from './app.dto';
 import { removeKeys } from './utils/removekey.util';
 import { PrismaService } from './utils/services/prisma.service';
 
@@ -139,5 +140,232 @@ export class AppService {
     return {
       can_checkout: true,
     };
+  }
+
+  async getPreview(query: PreviewQuery) {
+    if (query.code) {
+      const [bank, product] = await this.prisma.$transaction([
+        this.prisma.bankAccount.findUnique({
+          where: { bank_id: query.bank },
+          select: {
+            atas_nama: true,
+            bank: true,
+            no_rekening: true,
+          },
+        }),
+        this.prisma.produk.findUnique({
+          where: { kode_item: query.code },
+          select: {
+            kode_item: true,
+            nama_produk_asli: true,
+            kategori: true,
+            harga_6: true,
+            image: {
+              select: {
+                url: true,
+              },
+            },
+          },
+        }),
+      ]);
+
+      if (!bank || !product) {
+        return {};
+      }
+
+      const { nama_produk_asli, harga_6, image, kategori, kode_item } = product;
+
+      if (query.type == 'pickup') {
+        return {
+          type: 'pickup',
+          bank,
+          products: [
+            {
+              kode_item,
+              nama_produk_asli,
+              image,
+              kategori,
+              quantity: parseInt(query.quantity),
+              harga: harga_6,
+              subtotal_produk: parseInt(query.quantity) * harga_6,
+            },
+          ],
+          subtotal_ongkir: 0,
+          total: parseInt(query.quantity) * harga_6,
+        };
+      }
+
+      const address = await this.prisma.address.findUnique({
+        where: { address_id: query.address },
+      });
+
+      if (!address) {
+        return {};
+      }
+
+      return {
+        type: 'delivery',
+        bank,
+        products: [
+          {
+            kode_item,
+            image,
+            nama_produk_asli,
+            kategori,
+            quantity: parseInt(query.quantity),
+            harga: harga_6,
+            subtotal_produk: parseInt(query.quantity) * harga_6,
+          },
+        ],
+        address,
+        subtotal_ongkir: 0,
+        total: parseInt(query.quantity) * harga_6,
+      };
+    }
+
+    if (query.carts) {
+      const bank = await this.prisma.bankAccount.findUnique({
+        where: { bank_id: query.bank },
+        select: {
+          atas_nama: true,
+          bank: true,
+          no_rekening: true,
+        },
+      });
+
+      if (!bank) {
+        return {};
+      }
+
+      if (isArray(query.carts)) {
+        const products = [];
+
+        for (const item of query.carts) {
+          const cart = await this.prisma.cart.findUnique({
+            where: { cart_id: item },
+            select: {
+              qty: true,
+              produk: {
+                select: {
+                  kode_item: true,
+                  nama_produk_asli: true,
+                  kategori: true,
+                  harga_6: true,
+                  image: {
+                    select: {
+                      url: true,
+                    },
+                  },
+                },
+              },
+            },
+          });
+
+          products.push({
+            kode_item: cart.produk.kode_item,
+            nama_produk_asli: cart.produk.nama_produk_asli,
+            image: cart.produk.image,
+            kategori: cart.produk.kategori,
+            quantity: cart.qty,
+            harga: cart.produk.harga_6,
+            subtotal_produk: cart.qty * cart.produk.harga_6,
+          });
+        }
+
+        if (query.type == 'pickup') {
+          return {
+            type: 'pickup',
+            bank,
+            products,
+            subtotal_ongkir: 0,
+            total: products.reduce((a, b) => a + b.subtotal_produk, 0),
+          };
+        }
+
+        const address = await this.prisma.address.findUnique({
+          where: { address_id: query.address },
+        });
+
+        if (!address) {
+          return {};
+        }
+
+        return {
+          type: 'delivery',
+          bank,
+          products,
+          address,
+          subtotal_ongkir: 0,
+          total: products.reduce((a, b) => a + b.subtotal_produk, 0),
+        };
+      }
+
+      const cart = await this.prisma.cart.findUnique({
+        where: { cart_id: query.carts },
+        select: {
+          qty: true,
+          produk: {
+            select: {
+              kode_item: true,
+              nama_produk_asli: true,
+              kategori: true,
+              harga_6: true,
+              image: {
+                select: {
+                  url: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (query.type == 'pickup') {
+        return {
+          type: 'pickup',
+          bank,
+          products: [
+            {
+              kode_item: cart.produk.kode_item,
+              nama_produk_asli: cart.produk.nama_produk_asli,
+              image: cart.produk.image,
+              kategori: cart.produk.kategori,
+              quantity: cart.qty,
+              harga: cart.produk.harga_6,
+              subtotal_produk: cart.qty * cart.produk.harga_6,
+            },
+          ],
+          subtotal_ongkir: 0,
+          total: cart.qty * cart.produk.harga_6,
+        };
+      }
+
+      const address = await this.prisma.address.findUnique({
+        where: { address_id: query.address },
+      });
+
+      if (!address) {
+        return {};
+      }
+
+      return {
+        type: 'delivery',
+        bank,
+        products: [
+          {
+            kode_item: cart.produk.kode_item,
+            nama_produk_asli: cart.produk.nama_produk_asli,
+            image: cart.produk.image,
+            kategori: cart.produk.kategori,
+            quantity: cart.qty,
+            harga: cart.produk.harga_6,
+            subtotal_produk: cart.qty * cart.produk.harga_6,
+          },
+        ],
+        address,
+        subtotal_ongkir: 0,
+        total: cart.qty * cart.produk.harga_6,
+      };
+    }
   }
 }

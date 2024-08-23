@@ -9,6 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { PreviewQuery } from './app.dto';
 import { AppService } from './app.service';
 import { SuccessResponse } from './utils/global/global.response';
 import { UserGuard } from './utils/guards/user.guard';
@@ -132,6 +133,21 @@ export class AppController {
         success: true,
         status_code: HttpStatus.OK,
         data: {},
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/preview')
+  @UseGuards(UserGuard)
+  @HttpCode(HttpStatus.OK)
+  async getPreview(@Query() query: PreviewQuery): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getPreview(query),
       };
     } catch (error) {
       throw error;
