@@ -55,7 +55,6 @@ export class TransactionsService {
                     kode_item: product.kode_item,
                     kategori: product.kategori,
                     nama_produk: product.nama_produk_asli,
-
                     harga: product.harga,
                     quantity: product.quantity,
                     subtotal_produk: product.subtotal_produk,
@@ -247,8 +246,31 @@ export class TransactionsService {
         },
       });
 
+    let status = '';
+
+    if (payment.status == 'draft' && !transaction.replied) {
+      status += 'Menunggu balasan';
+    } else if (payment.status == 'draft' && transaction.replied) {
+      status += 'Menunggu konfirmasi anda';
+    } else if (payment.status == 'pending') {
+      status += 'Menunggu pembayaran';
+    } else if (payment.status == 'paid') {
+      status += 'Menunggu verifikasi';
+    } else if (payment.status == 'canceled') {
+      status += 'Pembayaran dibatalkan';
+    } else if (payment.status == 'done') {
+      if (transaction.status == 'process') {
+        status += 'Diproses';
+      } else if (transaction.status == 'done') {
+        status += 'Selesai';
+      } else if (transaction.status == 'canceled') {
+        status += 'Transaksi Dibatalkan';
+      }
+    }
+
     return {
       ...transaction,
+      status,
       payment,
       products: transaksiDetail,
     };

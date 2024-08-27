@@ -880,168 +880,271 @@ export class DashboardService {
     const status = !query.status ? 'waitrep' : query.status;
 
     if (status == 'waitrep') {
-      return this.prisma.transaksi.findMany({
-        where: {
-          payment: {
-            status: 'draft',
+      const [total, transactions] = await this.prisma.$transaction([
+        this.prisma.transaksi.count({
+          where: {
+            payment: {
+              status: 'draft',
+            },
+            replied: false,
           },
-          replied: false,
-        },
-        select: {
-          transaksi_id: true,
-          nama_penerima: true,
-          total: true,
-          type: true,
-          created_at: true,
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        take: limit,
-        skip,
-      });
+        }),
+        this.prisma.transaksi.findMany({
+          where: {
+            payment: {
+              status: 'draft',
+            },
+            replied: false,
+          },
+          select: {
+            transaksi_id: true,
+            nama_penerima: true,
+            total: true,
+            type: true,
+            created_at: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: limit,
+          skip,
+        }),
+      ]);
+
+      return {
+        transactions,
+        total,
+      };
     }
 
     if (status == 'waituser') {
-      return this.prisma.transaksi.findMany({
-        where: {
-          payment: {
-            status: 'draft',
+      const [total, transactions] = await this.prisma.$transaction([
+        this.prisma.transaksi.count({
+          where: {
+            payment: {
+              status: 'draft',
+            },
+            replied: true,
           },
-          replied: true,
-        },
-        select: {
-          transaksi_id: true,
-          nama_penerima: true,
-          total: true,
-          type: true,
-          created_at: true,
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        take: limit,
-        skip,
-      });
+        }),
+        this.prisma.transaksi.findMany({
+          where: {
+            payment: {
+              status: 'draft',
+            },
+            replied: true,
+          },
+          select: {
+            transaksi_id: true,
+            nama_penerima: true,
+            total: true,
+            type: true,
+            created_at: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: limit,
+          skip,
+        }),
+      ]);
+
+      return {
+        transactions,
+        total,
+      };
     }
 
     if (status == 'paypend') {
-      return this.prisma.transaksi.findMany({
-        where: {
-          payment: {
-            status: 'pending',
+      const [total, transactions] = await this.prisma.$transaction([
+        this.prisma.transaksi.count({
+          where: {
+            payment: {
+              status: 'pending',
+            },
           },
-        },
-        select: {
-          transaksi_id: true,
-          nama_penerima: true,
-          total: true,
-          type: true,
-          created_at: true,
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        take: limit,
-        skip,
-      });
+        }),
+        this.prisma.transaksi.findMany({
+          where: {
+            payment: {
+              status: 'pending',
+            },
+          },
+          select: {
+            transaksi_id: true,
+            nama_penerima: true,
+            total: true,
+            type: true,
+            created_at: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: limit,
+          skip,
+        }),
+      ]);
+
+      return {
+        transactions,
+        total,
+      };
     }
 
     if (status == 'payverif') {
-      return this.prisma.transaksi.findMany({
-        where: {
-          payment: {
-            status: 'paid',
+      const [total, transactions] = await this.prisma.$transaction([
+        this.prisma.transaksi.count({
+          where: {
+            payment: {
+              status: 'paid',
+            },
           },
-        },
-        select: {
-          transaksi_id: true,
-          nama_penerima: true,
-          total: true,
-          type: true,
-          created_at: true,
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        take: limit,
-        skip,
-      });
+        }),
+        this.prisma.transaksi.findMany({
+          where: {
+            payment: {
+              status: 'paid',
+            },
+          },
+          select: {
+            transaksi_id: true,
+            nama_penerima: true,
+            total: true,
+            type: true,
+            created_at: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: limit,
+          skip,
+        }),
+      ]);
+
+      return {
+        transactions,
+        total,
+      };
     }
 
     if (status == 'process') {
-      return this.prisma.transaksi.findMany({
-        where: {
-          status: 'process',
-        },
-        select: {
-          transaksi_id: true,
-          nama_penerima: true,
-          total: true,
-          type: true,
-          created_at: true,
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        take: limit,
-        skip,
-      });
+      const [total, transactions] = await this.prisma.$transaction([
+        this.prisma.transaksi.count({
+          where: {
+            status: 'process',
+          },
+        }),
+        this.prisma.transaksi.findMany({
+          where: {
+            status: 'process',
+          },
+          select: {
+            transaksi_id: true,
+            nama_penerima: true,
+            total: true,
+            type: true,
+            created_at: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: limit,
+          skip,
+        }),
+      ]);
+
+      return {
+        transactions,
+        total,
+      };
     }
 
     if (status == 'done') {
-      return this.prisma.transaksi.findMany({
-        where: {
-          status: 'done',
-        },
-        select: {
-          transaksi_id: true,
-          nama_penerima: true,
-          total: true,
-          type: true,
-          created_at: true,
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        take: limit,
-        skip,
-      });
+      const [total, transactions] = await this.prisma.$transaction([
+        this.prisma.transaksi.count({
+          where: {
+            status: 'done',
+          },
+        }),
+        this.prisma.transaksi.findMany({
+          where: {
+            status: 'done',
+          },
+          select: {
+            transaksi_id: true,
+            nama_penerima: true,
+            total: true,
+            type: true,
+            created_at: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: limit,
+          skip,
+        }),
+      ]);
+
+      return {
+        transactions,
+        total,
+      };
     }
 
     if (status == 'canceled') {
-      return this.prisma.transaksi.findMany({
-        where: {
-          OR: [
-            {
-              status: 'canceled',
-            },
-            {
-              payment: {
+      const [total, transactions] = await this.prisma.$transaction([
+        this.prisma.transaksi.count({
+          where: {
+            OR: [
+              {
                 status: 'canceled',
               },
-            },
-          ],
-        },
-        select: {
-          transaksi_id: true,
-          nama_penerima: true,
-          total: true,
-          type: true,
-          created_at: true,
-          alasan: true,
-          payment: {
-            select: {
-              alasan: true,
+              {
+                payment: {
+                  status: 'canceled',
+                },
+              },
+            ],
+          },
+        }),
+        this.prisma.transaksi.findMany({
+          where: {
+            OR: [
+              {
+                status: 'canceled',
+              },
+              {
+                payment: {
+                  status: 'canceled',
+                },
+              },
+            ],
+          },
+          select: {
+            transaksi_id: true,
+            nama_penerima: true,
+            total: true,
+            type: true,
+            created_at: true,
+            alasan: true,
+            payment: {
+              select: {
+                alasan: true,
+              },
             },
           },
-        },
-        orderBy: {
-          created_at: 'desc',
-        },
-        take: limit,
-        skip,
-      });
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: limit,
+          skip,
+        }),
+      ]);
+
+      return {
+        transactions,
+        total,
+      };
     }
   }
 
@@ -1330,8 +1433,31 @@ export class DashboardService {
         },
       });
 
+    let status = '';
+
+    if (payment.status == 'draft' && !transaction.replied) {
+      status += 'Menunggu balasan';
+    } else if (payment.status == 'draft' && transaction.replied) {
+      status += 'Menunggu konfirmasi user';
+    } else if (payment.status == 'pending') {
+      status += 'Menunggu pembayaran';
+    } else if (payment.status == 'paid') {
+      status += 'Menunggu verifikasi';
+    } else if (payment.status == 'canceled') {
+      status += 'Pembayaran dibatalkan';
+    } else if (payment.status == 'done') {
+      if (transaction.status == 'process') {
+        status += 'Diproses';
+      } else if (transaction.status == 'done') {
+        status += 'Selesai';
+      } else if (transaction.status == 'canceled') {
+        status += 'Transaksi Dibatalkan';
+      }
+    }
+
     return {
       ...transaction,
+      status,
       payment,
       products: transaksiDetail,
     };

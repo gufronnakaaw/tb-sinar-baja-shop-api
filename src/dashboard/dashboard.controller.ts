@@ -545,7 +545,7 @@ export class DashboardController {
     }
   }
 
-  @Patch('/transactions')
+  @Get('/transactions')
   @HttpCode(HttpStatus.OK)
   @UsePipes(new ZodValidationPipe(updateCostSchema))
   async getTransaction(
