@@ -97,3 +97,52 @@ export const updatePollingSchema = z.object({
 });
 
 export type UpdatePollingDto = z.infer<typeof updatePollingSchema>;
+
+export const updateCostSchema = z.object({
+  transaksi_id: z.string(),
+  subtotal_ongkir: z.number(),
+});
+
+export type UpdateCostDto = z.infer<typeof updateCostSchema>;
+
+export const updateDraftSchema = z.object({
+  transaksi_id: z.string(),
+  total: z.number(),
+});
+
+export type UpdateDraftDto = z.infer<typeof updateDraftSchema>;
+
+export type TransactionQuery = {
+  status:
+    | 'waitrep'
+    | 'waituser'
+    | 'paypend'
+    | 'payverif'
+    | 'process'
+    | 'done'
+    | 'canceled';
+  page: string;
+};
+
+export const updateVerificationSchema = z.object({
+  transaksi_id: z.string(),
+  is_verification: z.boolean(),
+});
+
+export type UpdateVerificationDto = z.infer<typeof updateVerificationSchema>;
+
+export const updateDoneSchema = z.object({
+  transaksi_id: z.string(),
+  is_done: z.boolean(),
+});
+
+export type UpdateDoneDto = z.infer<typeof updateDoneSchema>;
+
+export const updateCancelSchema = z.object({
+  transaksi_id: z.string(),
+  is_cancel: z.boolean(),
+  alasan: z.string().optional(),
+  type: z.enum(['transaksi', 'pembayaran']),
+});
+
+export type UpdateCancelDto = z.infer<typeof updateCancelSchema>;

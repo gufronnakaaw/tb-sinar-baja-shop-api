@@ -28,12 +28,23 @@ import {
   createBankSchema,
   CreatePollingDto,
   createPollingSchema,
+  TransactionQuery,
   updateActive,
   UpdateActive,
   UpdateBankDto,
   updateBankSchema,
+  UpdateCancelDto,
+  updateCancelSchema,
+  UpdateCostDto,
+  updateCostSchema,
+  UpdateDoneDto,
+  updateDoneSchema,
+  UpdateDraftDto,
+  updateDraftSchema,
   UpdatePollingDto,
   updatePollingSchema,
+  UpdateVerificationDto,
+  updateVerificationSchema,
 } from './dashboard.dto';
 import { DashboardService } from './dashboard.service';
 
@@ -42,9 +53,23 @@ import { DashboardService } from './dashboard.service';
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
+  @Get()
+  @HttpCode(HttpStatus.OK)
+  async indexDashboard(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getDashboard(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Get('/products')
   @HttpCode(HttpStatus.OK)
-  async index(@Query() query: ProductQuery): Promise<SuccessResponse> {
+  async indexProducts(@Query() query: ProductQuery): Promise<SuccessResponse> {
     try {
       return {
         success: true,
@@ -514,6 +539,130 @@ export class DashboardController {
         success: true,
         status_code: HttpStatus.OK,
         data: await this.dashboardService.getOperationals(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/transactions')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateCostSchema))
+  async getTransaction(
+    @Query() query: TransactionQuery,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getTransactions(query),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/transactions/cost')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateCostSchema))
+  async updateCost(@Body() body: UpdateCostDto): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updateCost(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/transactions/draft')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateDraftSchema))
+  async updateDraft(@Body() body: UpdateDraftDto): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updateDraft(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/transactions/verification')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateVerificationSchema))
+  async updateVerification(
+    @Body() body: UpdateVerificationDto,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updateVerification(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/transactions/done')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateDoneSchema))
+  async updateDone(@Body() body: UpdateDoneDto): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updateDone(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Patch('/transactions/cancel')
+  @HttpCode(HttpStatus.OK)
+  @UsePipes(new ZodValidationPipe(updateCancelSchema))
+  async updateCancel(@Body() body: UpdateCancelDto): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.updateCancel(body),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/transactions/tabs')
+  @HttpCode(HttpStatus.OK)
+  async getTransactionTabs(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getTransactionTabs(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/transactions/detail/:transaksi_id')
+  @HttpCode(HttpStatus.OK)
+  async getTransactionDetail(
+    @Param('transaksi_id') transaksi_id: string,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getTransactionDetail(transaksi_id),
       };
     } catch (error) {
       throw error;

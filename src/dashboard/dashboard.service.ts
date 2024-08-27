@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -29,8 +30,14 @@ import {
   KategoriPollingResponse,
   PenggunaPollingResponse,
   ProdukPollingResponse,
+  TransactionQuery,
   UpdateBankDto,
+  UpdateCancelDto,
+  UpdateCostDto,
+  UpdateDoneDto,
+  UpdateDraftDto,
   UpdatePollingDto,
+  UpdateVerificationDto,
 } from './dashboard.dto';
 
 @Injectable()
@@ -860,5 +867,473 @@ export class DashboardService {
 
   async getOperationals() {
     return this.prisma.operational.findMany();
+  }
+
+  async getTransactions(query: TransactionQuery) {
+    const defaultPage = 1;
+    const limit = 10;
+
+    const page = parseInt(query.page) ? parseInt(query.page) : defaultPage;
+
+    const skip = (page - 1) * limit;
+
+    const status = !query.status ? 'waitrep' : query.status;
+
+    if (status == 'waitrep') {
+      return this.prisma.transaksi.findMany({
+        where: {
+          payment: {
+            status: 'draft',
+          },
+          replied: false,
+        },
+        select: {
+          transaksi_id: true,
+          nama_penerima: true,
+          total: true,
+          type: true,
+          created_at: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: limit,
+        skip,
+      });
+    }
+
+    if (status == 'waituser') {
+      return this.prisma.transaksi.findMany({
+        where: {
+          payment: {
+            status: 'draft',
+          },
+          replied: true,
+        },
+        select: {
+          transaksi_id: true,
+          nama_penerima: true,
+          total: true,
+          type: true,
+          created_at: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: limit,
+        skip,
+      });
+    }
+
+    if (status == 'paypend') {
+      return this.prisma.transaksi.findMany({
+        where: {
+          payment: {
+            status: 'pending',
+          },
+        },
+        select: {
+          transaksi_id: true,
+          nama_penerima: true,
+          total: true,
+          type: true,
+          created_at: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: limit,
+        skip,
+      });
+    }
+
+    if (status == 'payverif') {
+      return this.prisma.transaksi.findMany({
+        where: {
+          payment: {
+            status: 'paid',
+          },
+        },
+        select: {
+          transaksi_id: true,
+          nama_penerima: true,
+          total: true,
+          type: true,
+          created_at: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: limit,
+        skip,
+      });
+    }
+
+    if (status == 'process') {
+      return this.prisma.transaksi.findMany({
+        where: {
+          status: 'process',
+        },
+        select: {
+          transaksi_id: true,
+          nama_penerima: true,
+          total: true,
+          type: true,
+          created_at: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: limit,
+        skip,
+      });
+    }
+
+    if (status == 'done') {
+      return this.prisma.transaksi.findMany({
+        where: {
+          status: 'done',
+        },
+        select: {
+          transaksi_id: true,
+          nama_penerima: true,
+          total: true,
+          type: true,
+          created_at: true,
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: limit,
+        skip,
+      });
+    }
+
+    if (status == 'canceled') {
+      return this.prisma.transaksi.findMany({
+        where: {
+          OR: [
+            {
+              status: 'canceled',
+            },
+            {
+              payment: {
+                status: 'canceled',
+              },
+            },
+          ],
+        },
+        select: {
+          transaksi_id: true,
+          nama_penerima: true,
+          total: true,
+          type: true,
+          created_at: true,
+          alasan: true,
+          payment: {
+            select: {
+              alasan: true,
+            },
+          },
+        },
+        orderBy: {
+          created_at: 'desc',
+        },
+        take: limit,
+        skip,
+      });
+    }
+  }
+
+  async updateDraft(body: UpdateDraftDto) {
+    const transaction = await this.prisma.transaksi.findUnique({
+      where: { transaksi_id: body.transaksi_id },
+      select: {
+        type: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (transaction.type != 'delivery') {
+      throw new ForbiddenException('Forbidden resource');
+    }
+
+    await this.prisma.transaksi.update({
+      where: {
+        transaksi_id: body.transaksi_id,
+      },
+      data: {
+        total: body.total,
+        status: 'pending',
+        payment: {
+          update: {
+            status: 'pending',
+          },
+        },
+      },
+    });
+
+    return body;
+  }
+
+  async updateCost(body: UpdateCostDto) {
+    const transaction = await this.prisma.transaksi.findUnique({
+      where: { transaksi_id: body.transaksi_id },
+      select: {
+        type: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (transaction.type != 'delivery') {
+      throw new ForbiddenException('Forbidden resource');
+    }
+
+    await this.prisma.transaksi.update({
+      where: {
+        transaksi_id: body.transaksi_id,
+      },
+      data: {
+        subtotal_ongkir: body.subtotal_ongkir,
+        replied: true,
+      },
+    });
+
+    return body;
+  }
+
+  async updateVerification(body: UpdateVerificationDto) {
+    const transaction = await this.prisma.transaksi.findUnique({
+      where: { transaksi_id: body.transaksi_id },
+      select: {
+        type: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (body.is_verification) {
+      await this.prisma.transaksi.update({
+        where: {
+          transaksi_id: body.transaksi_id,
+        },
+        data: {
+          status: 'process',
+          payment: {
+            update: {
+              status: 'done',
+            },
+          },
+        },
+      });
+    }
+
+    return body;
+  }
+
+  async updateDone(body: UpdateDoneDto) {
+    const transaction = await this.prisma.transaksi.findUnique({
+      where: { transaksi_id: body.transaksi_id },
+      select: {
+        type: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (body.is_done) {
+      await this.prisma.transaksi.update({
+        where: {
+          transaksi_id: body.transaksi_id,
+        },
+        data: {
+          status: 'done',
+        },
+      });
+    }
+
+    return body;
+  }
+
+  async updateCancel(body: UpdateCancelDto) {
+    const transaction = await this.prisma.transaksi.findUnique({
+      where: { transaksi_id: body.transaksi_id },
+      select: {
+        type: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (body.is_cancel) {
+      if (body.type == 'pembayaran') {
+        await this.prisma.payment.update({
+          where: {
+            transaksi_id: body.transaksi_id,
+          },
+          data: {
+            status: 'canceled',
+            alasan: body.alasan,
+            expired: null,
+          },
+        });
+      }
+
+      if (body.type == 'transaksi') {
+        await this.prisma.transaksi.update({
+          where: {
+            transaksi_id: body.transaksi_id,
+          },
+          data: {
+            status: 'canceled',
+            alasan: body.alasan,
+          },
+        });
+      }
+    }
+
+    return body;
+  }
+
+  async getDashboard() {
+    const today = new Date();
+    const start = new Date(today.setHours(0, 0, 0, 0));
+    const end = new Date(today.setHours(23, 59, 59, 999));
+
+    const [transactions, delivery] = await this.prisma.$transaction([
+      this.prisma.transaksi.findMany({
+        where: {
+          created_at: {
+            gte: start,
+            lte: end,
+          },
+        },
+        select: {
+          total: true,
+        },
+      }),
+      this.prisma.transaksi.findMany({
+        where: {
+          AND: [
+            {
+              created_at: {
+                gte: start,
+                lte: end,
+              },
+            },
+            { type: 'delivery' },
+          ],
+        },
+        select: {
+          total: true,
+        },
+      }),
+    ]);
+
+    return {
+      transactions: {
+        amount: transactions.length,
+        total: transactions.reduce((a, b) => a + b.total, 0),
+      },
+      delivery: {
+        amount: delivery.length,
+        total: delivery.reduce((a, b) => a + b.total, 0),
+      },
+    };
+  }
+
+  async getTransactionTabs() {
+    const transactions = await this.prisma.transaksi.findMany({
+      select: {
+        status: true,
+        replied: true,
+        payment: { select: { status: true } },
+      },
+    });
+
+    return {
+      waitrep: transactions.filter(
+        (item) => item.payment.status == 'draft' && !item.replied,
+      ).length,
+      waituser: transactions.filter(
+        (item) => item.payment.status == 'draft' && item.replied,
+      ).length,
+      paypend: transactions.filter((item) => item.payment.status == 'pending')
+        .length,
+      payverif: transactions.filter((item) => item.payment.status == 'paid')
+        .length,
+      process: transactions.filter((item) => item.status == 'process').length,
+      done: transactions.filter((item) => item.status == 'done').length,
+      canceled: transactions.filter(
+        (item) =>
+          item.status == 'canceled' || item.payment.status == 'canceled',
+      ).length,
+    };
+  }
+
+  async getTransactionDetail(transaksi_id: string) {
+    const { payment, transaksiDetail, ...transaction } =
+      await this.prisma.transaksi.findUnique({
+        where: {
+          transaksi_id,
+        },
+        select: {
+          transaksi_id: true,
+          type: true,
+          nama_penerima: true,
+          created_at: true,
+          no_telpon: true,
+          provinsi: true,
+          kota: true,
+          kecamatan: true,
+          alamat_lengkap: true,
+          kode_pos: true,
+          subtotal_produk: true,
+          subtotal_ongkir: true,
+          total: true,
+          alasan: true,
+          replied: true,
+          status: true,
+          payment: {
+            select: {
+              url: true,
+              dari: true,
+              expired: true,
+              metode: true,
+              nama: true,
+              alasan: true,
+              status: true,
+            },
+          },
+          transaksiDetail: {
+            select: {
+              nama_produk: true,
+              kode_item: true,
+              harga: true,
+              kategori: true,
+              quantity: true,
+              subtotal_produk: true,
+            },
+          },
+        },
+      });
+
+    return {
+      ...transaction,
+      payment,
+      products: transaksiDetail,
+    };
   }
 }

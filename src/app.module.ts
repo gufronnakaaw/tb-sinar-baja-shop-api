@@ -8,8 +8,10 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CartsModule } from './carts/carts.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { PaymentsModule } from './payments/payments.module';
 import { ProductsModule } from './products/products.module';
 import { ProfileModule } from './profile/profile.module';
+import { TransactionsModule } from './transactions/transactions.module';
 import { GlobalMiddleware } from './utils/global/global.middleware';
 import { PrismaService } from './utils/services/prisma.service';
 
@@ -32,6 +34,8 @@ import { PrismaService } from './utils/services/prisma.service';
     AuthModule,
     ProfileModule,
     CartsModule,
+    PaymentsModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
