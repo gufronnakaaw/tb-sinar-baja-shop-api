@@ -85,7 +85,6 @@ model Produk {
 
   image                   Image[]
   cart                    Cart[]
-  transaksidetail         TransaksiDetail[]
 
   @@map("produk")        
 }
@@ -208,6 +207,8 @@ enum Type {
 enum StatusTransaksi {
   draft
   pending
+  process
+  done
   canceled
 }
 
@@ -250,6 +251,7 @@ model Transaksi {
 
   user             User             @relation(fields: [user_id], references: [user_id])
   payment          Payment?
+  transaksiDetail  TransaksiDetail[]
 
   @@map("transaksi")
 }
@@ -257,15 +259,17 @@ model Transaksi {
 model TransaksiDetail {
   id               Int              @id               @default(autoincrement())
   transaksi_id     String           
-  produk_id        String
+  kode_item        String
+  nama_produk      String
+  kategori         String
   quantity         Float
   harga            Int              @db.UnsignedInt
-  subtotal         Int              @db.UnsignedInt
-
-  produk           Produk           @relation(fields: [produk_id], references: [kode_item])
+  subtotal_produk  Int              @db.UnsignedInt
 
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
+
+  transaksi        Transaksi        @relation(fields: [transaksi_id], references: [transaksi_id])
 
   @@map("transaksidetail")
 }
