@@ -25,7 +25,9 @@ export class ProfileService {
 
     return {
       ...user,
-      total_transaction: 0,
+      total_transaction: await this.prisma.transaksi.count({
+        where: { user_id },
+      }),
     };
   }
 
