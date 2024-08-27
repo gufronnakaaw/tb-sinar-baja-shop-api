@@ -547,7 +547,6 @@ export class DashboardController {
 
   @Get('/transactions')
   @HttpCode(HttpStatus.OK)
-  @UsePipes(new ZodValidationPipe(updateCostSchema))
   async getTransaction(
     @Query() query: TransactionQuery,
   ): Promise<SuccessResponse> {
