@@ -368,4 +368,36 @@ export class AppService {
       };
     }
   }
+
+  getWaiting(id: string) {
+    return this.prisma.transaksi.findUnique({
+      where: {
+        transaksi_id: id,
+        type: 'delivery',
+      },
+      select: {
+        transaksi_id: true,
+        replied: true,
+        total: true,
+        subtotal_ongkir: true,
+        subtotal_produk: true,
+      },
+    });
+  }
+
+  getPayment(id: string) {
+    return this.prisma.transaksi.findUnique({
+      where: {
+        transaksi_id: id,
+      },
+      select: {
+        bank: true,
+        no_rekening: true,
+        atas_nama: true,
+        subtotal_produk: true,
+        subtotal_ongkir: true,
+        total: true,
+      },
+    });
+  }
 }

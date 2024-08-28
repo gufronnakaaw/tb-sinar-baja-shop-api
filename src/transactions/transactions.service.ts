@@ -66,6 +66,16 @@ export class TransactionsService {
         }),
       ]);
 
+      if (body.carts) {
+        await this.prisma.cart.deleteMany({
+          where: {
+            cart_id: {
+              in: body.carts,
+            },
+          },
+        });
+      }
+
       return {
         transaksi_id: generateID('#', date),
         type: body.type,

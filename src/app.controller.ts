@@ -153,4 +153,34 @@ export class AppController {
       throw error;
     }
   }
+
+  @Get('/waiting')
+  @UseGuards(UserGuard)
+  @HttpCode(HttpStatus.OK)
+  async getWaiting(@Query() query: { id: string }): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getWaiting(query.id),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('/payment')
+  @UseGuards(UserGuard)
+  @HttpCode(HttpStatus.OK)
+  async getPayment(@Query() query: { id: string }): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getPayment(query.id),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }

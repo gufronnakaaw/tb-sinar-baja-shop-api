@@ -35,6 +35,7 @@ export const createTransactionSchema = z.object({
     .optional(),
   subtotal_ongkir: z.number(),
   total: z.number(),
+  carts: z.array(z.string()).optional(),
 });
 
 export type CreateTransactionDto = z.infer<typeof createTransactionSchema>;
