@@ -85,6 +85,7 @@ model Produk {
 
   image                   Image[]
   cart                    Cart[]
+  transaksiDetail         TransaksiDetail[]
 
   @@map("produk")        
 }
@@ -270,6 +271,7 @@ model TransaksiDetail {
   updated_at       DateTime         @updatedAt
 
   transaksi        Transaksi        @relation(fields: [transaksi_id], references: [transaksi_id])
+  produk           Produk           @relation(fields: [kode_item], references: [kode_item])
 
   @@map("transaksidetail")
 }
