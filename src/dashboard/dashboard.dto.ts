@@ -105,13 +105,6 @@ export const updateCostSchema = z.object({
 
 export type UpdateCostDto = z.infer<typeof updateCostSchema>;
 
-export const updateDraftSchema = z.object({
-  transaksi_id: z.string(),
-  total: z.number(),
-});
-
-export type UpdateDraftDto = z.infer<typeof updateDraftSchema>;
-
 export type TransactionQuery = {
   status:
     | 'waitrep'

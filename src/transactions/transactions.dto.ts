@@ -39,3 +39,10 @@ export const createTransactionSchema = z.object({
 });
 
 export type CreateTransactionDto = z.infer<typeof createTransactionSchema>;
+
+export const updateDraftSchema = z.object({
+  transaksi_id: z.string(),
+  total: z.number(),
+});
+
+export type UpdateDraftDto = z.infer<typeof updateDraftSchema>;

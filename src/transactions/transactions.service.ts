@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { UpdateCancelDto } from 'src/dashboard/dashboard.dto';
 import { generateID } from '../utils/generate.util';
 import { PrismaService } from '../utils/services/prisma.service';
-import { CreateTransactionDto } from './transactions.dto';
+import { CreateTransactionDto, UpdateDraftDto } from './transactions.dto';
 
 @Injectable()
 export class TransactionsService {
@@ -300,5 +305,81 @@ export class TransactionsService {
       payment,
       products: transaksiDetail,
     };
+  }
+
+  async updateDraft(body: UpdateDraftDto) {
+    const transaction = await this.prisma.transaksi.findUnique({
+      where: { transaksi_id: body.transaksi_id },
+      select: {
+        type: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (transaction.type != 'delivery') {
+      throw new ForbiddenException('Forbidden resource');
+    }
+
+    await this.prisma.transaksi.update({
+      where: {
+        transaksi_id: body.transaksi_id,
+      },
+      data: {
+        total: body.total,
+        status: 'pending',
+        payment: {
+          update: {
+            status: 'pending',
+          },
+        },
+      },
+    });
+
+    return body;
+  }
+
+  async updateCancel(body: UpdateCancelDto) {
+    const transaction = await this.prisma.transaksi.findUnique({
+      where: { transaksi_id: body.transaksi_id },
+      select: {
+        type: true,
+      },
+    });
+
+    if (!transaction) {
+      throw new NotFoundException('Transaction not found');
+    }
+
+    if (body.is_cancel) {
+      if (body.type == 'pembayaran') {
+        await this.prisma.payment.update({
+          where: {
+            transaksi_id: body.transaksi_id,
+          },
+          data: {
+            status: 'canceled',
+            alasan: body.alasan,
+            expired: null,
+          },
+        });
+      }
+
+      if (body.type == 'transaksi') {
+        await this.prisma.transaksi.update({
+          where: {
+            transaksi_id: body.transaksi_id,
+          },
+          data: {
+            status: 'canceled',
+            alasan: body.alasan,
+          },
+        });
+      }
+    }
+
+    return body;
   }
 }

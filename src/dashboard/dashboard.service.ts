@@ -35,7 +35,6 @@ import {
   UpdateCancelDto,
   UpdateCostDto,
   UpdateDoneDto,
-  UpdateDraftDto,
   UpdatePollingDto,
   UpdateVerificationDto,
 } from './dashboard.dto';
@@ -1146,40 +1145,6 @@ export class DashboardService {
         total,
       };
     }
-  }
-
-  async updateDraft(body: UpdateDraftDto) {
-    const transaction = await this.prisma.transaksi.findUnique({
-      where: { transaksi_id: body.transaksi_id },
-      select: {
-        type: true,
-      },
-    });
-
-    if (!transaction) {
-      throw new NotFoundException('Transaction not found');
-    }
-
-    if (transaction.type != 'delivery') {
-      throw new ForbiddenException('Forbidden resource');
-    }
-
-    await this.prisma.transaksi.update({
-      where: {
-        transaksi_id: body.transaksi_id,
-      },
-      data: {
-        total: body.total,
-        status: 'pending',
-        payment: {
-          update: {
-            status: 'pending',
-          },
-        },
-      },
-    });
-
-    return body;
   }
 
   async updateCost(body: UpdateCostDto) {

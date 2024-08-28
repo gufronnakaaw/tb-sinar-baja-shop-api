@@ -39,8 +39,6 @@ import {
   updateCostSchema,
   UpdateDoneDto,
   updateDoneSchema,
-  UpdateDraftDto,
-  updateDraftSchema,
   UpdatePollingDto,
   updatePollingSchema,
   UpdateVerificationDto,
@@ -570,21 +568,6 @@ export class DashboardController {
         success: true,
         status_code: HttpStatus.OK,
         data: await this.dashboardService.updateCost(body),
-      };
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Patch('/transactions/draft')
-  @HttpCode(HttpStatus.OK)
-  @UsePipes(new ZodValidationPipe(updateDraftSchema))
-  async updateDraft(@Body() body: UpdateDraftDto): Promise<SuccessResponse> {
-    try {
-      return {
-        success: true,
-        status_code: HttpStatus.OK,
-        data: await this.dashboardService.updateDraft(body),
       };
     } catch (error) {
       throw error;
