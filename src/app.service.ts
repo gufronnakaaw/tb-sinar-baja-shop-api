@@ -373,7 +373,6 @@ export class AppService {
     return this.prisma.transaksi.findUnique({
       where: {
         transaksi_id: id,
-        type: 'delivery',
       },
       select: {
         transaksi_id: true,

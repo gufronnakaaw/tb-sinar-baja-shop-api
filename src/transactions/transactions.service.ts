@@ -21,6 +21,11 @@ export class TransactionsService {
     }
 
     if (body.type == 'pickup') {
+      const user = await this.prisma.user.findUnique({
+        where: { user_id },
+        select: { nama: true, no_telpon: true },
+      });
+
       await this.prisma.$transaction([
         ...decrementStock,
         this.prisma.transaksi.create({
@@ -30,6 +35,8 @@ export class TransactionsService {
             no_rekening: body.bank.no_rekening,
             atas_nama: body.bank.atas_nama,
             bank: body.bank.bank,
+            nama_penerima: user.nama,
+            no_telpon: user.no_telpon,
             type: body.type,
             subtotal_produk: body.products.reduce(
               (a, b) => a + b.subtotal_produk,
@@ -126,7 +133,6 @@ export class TransactionsService {
                   kode_item: product.kode_item,
                   kategori: product.kategori,
                   nama_produk: product.nama_produk_asli,
-
                   harga: product.harga,
                   quantity: product.quantity,
                   subtotal_produk: product.subtotal_produk,
@@ -137,6 +143,16 @@ export class TransactionsService {
         },
       }),
     ]);
+
+    if (body.carts) {
+      await this.prisma.cart.deleteMany({
+        where: {
+          cart_id: {
+            in: body.carts,
+          },
+        },
+      });
+    }
 
     return {
       transaksi_id: generateID('#', date),
