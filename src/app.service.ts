@@ -369,8 +369,8 @@ export class AppService {
     }
   }
 
-  getWaiting(id: string) {
-    return this.prisma.transaksi.findUnique({
+  async getWaiting(id: string) {
+    const { payment, ...transaction } = await this.prisma.transaksi.findUnique({
       where: {
         transaksi_id: id,
       },
@@ -380,8 +380,41 @@ export class AppService {
         total: true,
         subtotal_ongkir: true,
         subtotal_produk: true,
+        status: true,
+        payment: {
+          select: {
+            status: true,
+          },
+        },
       },
     });
+
+    let status = '';
+
+    if (payment.status == 'draft' && !transaction.replied) {
+      status += 'Menunggu balasan';
+    } else if (payment.status == 'draft' && transaction.replied) {
+      status += 'Menunggu konfirmasi anda';
+    } else if (payment.status == 'pending') {
+      status += 'Menunggu pembayaran';
+    } else if (payment.status == 'paid') {
+      status += 'Menunggu verifikasi';
+    } else if (payment.status == 'canceled') {
+      status += 'Pembayaran dibatalkan';
+    } else if (payment.status == 'done') {
+      if (transaction.status == 'process') {
+        status += 'Diproses';
+      } else if (transaction.status == 'done') {
+        status += 'Selesai';
+      } else if (transaction.status == 'canceled') {
+        status += 'Transaksi Dibatalkan';
+      }
+    }
+
+    return {
+      ...transaction,
+      status,
+    };
   }
 
   getPayment(id: string) {
