@@ -266,6 +266,18 @@ export class TransactionsService {
           },
           transaksiDetail: {
             select: {
+              produk: {
+                select: {
+                  image: {
+                    select: {
+                      url: true,
+                    },
+                    orderBy: {
+                      created_at: 'desc',
+                    },
+                  },
+                },
+              },
               nama_produk: true,
               kode_item: true,
               harga: true,
@@ -303,7 +315,14 @@ export class TransactionsService {
       ...transaction,
       status,
       payment,
-      products: transaksiDetail,
+      products: transaksiDetail.map((product) => {
+        const { produk, ...all } = product;
+
+        return {
+          ...all,
+          image: produk.image,
+        };
+      }),
     };
   }
 
