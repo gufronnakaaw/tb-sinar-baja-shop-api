@@ -429,6 +429,12 @@ export class AppService {
         subtotal_produk: true,
         subtotal_ongkir: true,
         total: true,
+        payment: {
+          select: {
+            alasan: true,
+            status: true,
+          },
+        },
       },
     });
   }

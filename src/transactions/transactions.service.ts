@@ -314,7 +314,10 @@ export class TransactionsService {
     return {
       ...transaction,
       status,
-      payment,
+      payment: {
+        ...payment,
+        expired: payment.expired.toString(),
+      },
       products: transaksiDetail.map((product) => {
         const { produk, ...all } = product;
 
@@ -394,6 +397,11 @@ export class TransactionsService {
           data: {
             status: 'canceled',
             alasan: body.alasan,
+            payment: {
+              update: {
+                status: 'done',
+              },
+            },
           },
         });
       }

@@ -1141,6 +1141,7 @@ export class DashboardService {
       ]);
 
       return {
+        tabs: await this.getTransactionTabs(),
         transactions,
         total,
       };
@@ -1267,6 +1268,11 @@ export class DashboardService {
           data: {
             status: 'canceled',
             alasan: body.alasan,
+            payment: {
+              update: {
+                status: 'done',
+              },
+            },
           },
         });
       }
@@ -1423,7 +1429,10 @@ export class DashboardService {
     return {
       ...transaction,
       status,
-      payment,
+      payment: {
+        ...payment,
+        expired: payment.expired.toString(),
+      },
       products: transaksiDetail,
     };
   }
