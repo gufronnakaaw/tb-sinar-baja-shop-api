@@ -911,6 +911,7 @@ export class DashboardService {
       ]);
 
       return {
+        tabs: await this.getTransactionTabs(),
         transactions,
         total,
       };
@@ -949,6 +950,7 @@ export class DashboardService {
       ]);
 
       return {
+        tabs: await this.getTransactionTabs(),
         transactions,
         total,
       };
@@ -985,6 +987,7 @@ export class DashboardService {
       ]);
 
       return {
+        tabs: await this.getTransactionTabs(),
         transactions,
         total,
       };
@@ -1021,6 +1024,7 @@ export class DashboardService {
       ]);
 
       return {
+        tabs: await this.getTransactionTabs(),
         transactions,
         total,
       };
@@ -1053,6 +1057,7 @@ export class DashboardService {
       ]);
 
       return {
+        tabs: await this.getTransactionTabs(),
         transactions,
         total,
       };
@@ -1085,6 +1090,7 @@ export class DashboardService {
       ]);
 
       return {
+        tabs: await this.getTransactionTabs(),
         transactions,
         total,
       };
@@ -1431,7 +1437,7 @@ export class DashboardService {
       status,
       payment: {
         ...payment,
-        expired: payment.expired.toString(),
+        expired: payment.expired ? payment.expired.toString() : null,
       },
       products: transaksiDetail,
     };

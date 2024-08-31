@@ -316,7 +316,7 @@ export class TransactionsService {
       status,
       payment: {
         ...payment,
-        expired: payment.expired.toString(),
+        expired: payment.expired ? payment.expired.toString() : null,
       },
       products: transaksiDetail.map((product) => {
         const { produk, ...all } = product;
