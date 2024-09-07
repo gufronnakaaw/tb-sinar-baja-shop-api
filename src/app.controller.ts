@@ -183,4 +183,18 @@ export class AppController {
       throw error;
     }
   }
+
+  @Get('/operational')
+  @HttpCode(HttpStatus.OK)
+  async getOperational(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.appService.getOperational(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
 }

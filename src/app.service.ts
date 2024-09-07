@@ -438,4 +438,28 @@ export class AppService {
       },
     });
   }
+
+  async getOperational() {
+    const days = [
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+      'Minggu',
+    ];
+
+    const result = await this.prisma.operational.findMany({
+      select: {
+        hari: true,
+        open: true,
+        close: true,
+      },
+    });
+
+    return result.sort((a, b) => {
+      return days.indexOf(a.hari) - days.indexOf(b.hari);
+    });
+  }
 }
