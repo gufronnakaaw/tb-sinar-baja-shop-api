@@ -26,6 +26,8 @@ import { AdminGuard } from '../utils/guards/admin.guard';
 import {
   CreateBankDto,
   createBankSchema,
+  CreateOperationalDto,
+  createOperationalSchema,
   CreatePollingDto,
   createPollingSchema,
   TransactionQuery,
@@ -537,6 +539,23 @@ export class DashboardController {
         success: true,
         status_code: HttpStatus.OK,
         data: await this.dashboardService.getOperationals(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Post('/operational')
+  @HttpCode(HttpStatus.CREATED)
+  @UsePipes(new ZodValidationPipe(createOperationalSchema))
+  async createOperational(
+    @Body() body: CreateOperationalDto,
+  ): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.CREATED,
+        data: await this.dashboardService.createOperational(body),
       };
     } catch (error) {
       throw error;

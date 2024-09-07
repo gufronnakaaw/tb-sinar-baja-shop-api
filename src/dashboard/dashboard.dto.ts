@@ -139,3 +139,15 @@ export const updateCancelSchema = z.object({
 });
 
 export type UpdateCancelDto = z.infer<typeof updateCancelSchema>;
+
+export const createOperationalSchema = z
+  .array(
+    z.object({
+      hari: z.string(),
+      open: z.string(),
+      close: z.string(),
+    }),
+  )
+  .min(7);
+
+export type CreateOperationalDto = z.infer<typeof createOperationalSchema>;

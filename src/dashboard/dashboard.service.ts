@@ -26,6 +26,7 @@ import { removeKeys } from '../utils/removekey.util';
 import { PrismaService } from '../utils/services/prisma.service';
 import {
   CreateBankDto,
+  CreateOperationalDto,
   CreatePollingDto,
   KategoriPollingResponse,
   PenggunaPollingResponse,
@@ -865,7 +866,53 @@ export class DashboardService {
   }
 
   async getOperationals() {
-    return this.prisma.operational.findMany();
+    const days = [
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu',
+      'Minggu',
+    ];
+
+    const result = await this.prisma.operational.findMany({
+      select: {
+        hari: true,
+        open: true,
+        close: true,
+      },
+    });
+
+    return result.sort((a, b) => {
+      return days.indexOf(a.hari) - days.indexOf(b.hari);
+    });
+  }
+
+  async createOperational(body: CreateOperationalDto) {
+    const promises = [];
+    for (const element of body) {
+      promises.push(
+        this.prisma.operational.upsert({
+          where: {
+            hari: element.hari,
+          },
+          create: {
+            hari: element.hari,
+            open: element.open,
+            close: element.close,
+          },
+          update: {
+            open: element.open,
+            close: element.close,
+          },
+        }),
+      );
+    }
+
+    await Promise.all(promises);
+
+    return body;
   }
 
   async getTransactions(query: TransactionQuery) {
