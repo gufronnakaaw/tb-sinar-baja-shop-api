@@ -115,6 +115,7 @@ export type TransactionQuery = {
     | 'done'
     | 'canceled';
   page: string;
+  q?: string;
 };
 
 export const updateVerificationSchema = z.object({

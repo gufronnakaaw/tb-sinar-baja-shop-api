@@ -568,6 +568,14 @@ export class DashboardController {
     @Query() query: TransactionQuery,
   ): Promise<SuccessResponse> {
     try {
+      if (query.q) {
+        return {
+          success: true,
+          status_code: HttpStatus.OK,
+          data: await this.dashboardService.searchTransaction(query.q),
+        };
+      }
+
       return {
         success: true,
         status_code: HttpStatus.OK,

@@ -1489,4 +1489,68 @@ export class DashboardService {
       products: transaksiDetail,
     };
   }
+
+  async searchTransaction(q: string) {
+    const result = await this.prisma.transaksi.findMany({
+      where: {
+        OR: [
+          {
+            transaksi_id: {
+              contains: q,
+            },
+          },
+          {
+            nama_penerima: {
+              contains: q,
+            },
+          },
+        ],
+      },
+      select: {
+        transaksi_id: true,
+        nama_penerima: true,
+        total: true,
+        type: true,
+        created_at: true,
+        status: true,
+        replied: true,
+        payment: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    });
+
+    return result.map((transaction) => {
+      let status = '';
+
+      if (transaction.payment.status == 'draft' && !transaction.replied) {
+        status += 'Menunggu balasan';
+      } else if (transaction.payment.status == 'draft' && transaction.replied) {
+        status += 'Menunggu konfirmasi anda';
+      } else if (transaction.payment.status == 'pending') {
+        status += 'Menunggu pembayaran';
+      } else if (transaction.payment.status == 'paid') {
+        status += 'Menunggu verifikasi';
+      } else if (transaction.payment.status == 'canceled') {
+        status += 'Pembayaran dibatalkan';
+      } else if (transaction.payment.status == 'done') {
+        if (transaction.status == 'process') {
+          status += 'Diproses';
+        } else if (transaction.status == 'done') {
+          status += 'Selesai';
+        } else if (transaction.status == 'canceled') {
+          status += 'Transaksi Dibatalkan';
+        }
+      }
+
+      delete transaction.payment;
+
+      return {
+        ...transaction,
+        status,
+      };
+    });
+  }
 }
