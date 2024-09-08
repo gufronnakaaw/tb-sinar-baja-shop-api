@@ -1339,35 +1339,50 @@ export class DashboardService {
     const start = new Date(today.setHours(0, 0, 0, 0));
     const end = new Date(today.setHours(23, 59, 59, 999));
 
-    const [transactions, delivery] = await this.prisma.$transaction([
-      this.prisma.transaksi.findMany({
-        where: {
-          created_at: {
-            gte: start,
-            lte: end,
-          },
-        },
-        select: {
-          total: true,
-        },
-      }),
-      this.prisma.transaksi.findMany({
-        where: {
-          AND: [
-            {
-              created_at: {
-                gte: start,
-                lte: end,
-              },
+    const [transactions, delivery, count, total] =
+      await this.prisma.$transaction([
+        this.prisma.transaksi.findMany({
+          where: {
+            created_at: {
+              gte: start,
+              lte: end,
             },
-            { type: 'delivery' },
-          ],
-        },
-        select: {
-          total: true,
-        },
-      }),
-    ]);
+          },
+          select: {
+            total: true,
+          },
+        }),
+        this.prisma.transaksi.findMany({
+          where: {
+            AND: [
+              {
+                created_at: {
+                  gte: start,
+                  lte: end,
+                },
+              },
+              { type: 'delivery' },
+            ],
+          },
+          select: {
+            total: true,
+          },
+        }),
+
+        this.prisma.transaksi.count({
+          where: {
+            status: 'done',
+          },
+        }),
+        this.prisma.transaksi.aggregate({
+          where: {
+            status: 'done',
+          },
+          _sum: {
+            total: true,
+          },
+        }),
+      ]);
 
     return {
       transactions: {
@@ -1378,6 +1393,8 @@ export class DashboardService {
         amount: delivery.length,
         total: delivery.reduce((a, b) => a + b.total, 0),
       },
+      done_transaction: count,
+      total_done_transaction: total._sum.total ? total._sum.total : 0,
     };
   }
 
