@@ -545,6 +545,20 @@ export class DashboardController {
     }
   }
 
+  @Get('/users')
+  @HttpCode(HttpStatus.OK)
+  async getUsers(): Promise<SuccessResponse> {
+    try {
+      return {
+        success: true,
+        status_code: HttpStatus.OK,
+        data: await this.dashboardService.getUsers(),
+      };
+    } catch (error) {
+      throw error;
+    }
+  }
+
   @Post('/operational')
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ZodValidationPipe(createOperationalSchema))

@@ -1570,4 +1570,19 @@ export class DashboardService {
       };
     });
   }
+
+  getUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        nama: true,
+        email: true,
+        jenis_kelamin: true,
+        no_telpon: true,
+        created_at: true,
+      },
+      orderBy: {
+        created_at: 'desc',
+      },
+    });
+  }
 }
