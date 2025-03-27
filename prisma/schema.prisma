@@ -97,7 +97,7 @@ model Image {
   created_at              DateTime      @default(now())
   updated_at              DateTime      @updatedAt
 
-  produk                  Produk        @relation(fields: [kode_item], references: [kode_item])
+  produk                  Produk        @relation(fields: [kode_item], references: [kode_item], onDelete: Cascade)
 
   @@map("image")
 }
@@ -156,7 +156,7 @@ model Address {
   kode_pos         String           @db.VarChar(255)
   main_address     Boolean          
 
-  user             User             @relation(fields: [user_id], references: [user_id])
+  user             User             @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   
   @@map("address")
 }
@@ -168,8 +168,8 @@ model Cart {
   qty              Float            @db.Float()
   active           Boolean          @default(true)
 
-  produk           Produk           @relation(fields: [kode_item], references: [kode_item])     
-  user             User             @relation(fields: [user_id], references: [user_id])
+  produk           Produk           @relation(fields: [kode_item], references: [kode_item], onDelete: Cascade)     
+  user             User             @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
 
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
@@ -250,7 +250,7 @@ model Transaksi {
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
 
-  user             User             @relation(fields: [user_id], references: [user_id])
+  user             User             @relation(fields: [user_id], references: [user_id], onDelete: Cascade)
   payment          Payment?
   transaksiDetail  TransaksiDetail[]
 
@@ -270,8 +270,8 @@ model TransaksiDetail {
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
 
-  transaksi        Transaksi        @relation(fields: [transaksi_id], references: [transaksi_id])
-  produk           Produk           @relation(fields: [kode_item], references: [kode_item])
+  transaksi        Transaksi        @relation(fields: [transaksi_id], references: [transaksi_id], onDelete: Cascade)
+  produk           Produk           @relation(fields: [kode_item], references: [kode_item], onDelete: Cascade)
 
   @@map("transaksidetail")
 }
@@ -291,7 +291,7 @@ model Payment {
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
 
-  transaksi        Transaksi        @relation(fields: [transaksi_id], references: [transaksi_id])
+  transaksi        Transaksi        @relation(fields: [transaksi_id], references: [transaksi_id], onDelete: Cascade)
   
   @@map("payment")
 }
